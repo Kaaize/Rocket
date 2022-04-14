@@ -1,7 +1,7 @@
 from math import e
 from sqlite3.dbapi2 import Cursor
 from data import *
-from random import randint,choice
+from random import random,choice
 import sqlite3
 #----------------FUNÇÕES
 def map(x, in_min, in_max, out_min, out_max):
@@ -210,11 +210,11 @@ def BauRot(char1, char2, char3, keys):
     chars = {char1: 0, char2: 0, char3: 0, 'others': 0}
     for i in range(0,keys):
         frags = 20
-        if randint(0,100) <= chance100[keyn]:
+        if random() <= chance100[keyn]/100:
             frags = 100
             keyn = 13
-        chance = randint(0,100)
-        if chance <= 40:
+        chance = random()
+        if chance <= 0.40:
             choosen = choice([char1,char2,char3])
             chars[choosen] += frags
         else:
@@ -239,9 +239,8 @@ def Boosts(start,end,try_cost, sky, wise, crimson):
         boost = start_boost
         while boost < final_boost:
             for j in range(0,cap[boost]):
-                sorteio = randint(0,100)
-                #print(chances[boost], cap[boost], j+1, sorteio)
-                if sorteio <= chances[boost] or j+1 == cap[boost]:
+                sorteio = random
+                if sorteio <= (chances[boost]/100) or j+1 == cap[boost]:
                     tent += 1
                     if boost < 4:
                         custo += tipo*sky
