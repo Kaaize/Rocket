@@ -1,3 +1,4 @@
+from math import e
 from sqlite3.dbapi2 import Cursor
 from data import *
 from random import random,choice
@@ -339,10 +340,10 @@ def BauRot(char1, char2, char3, keys):
     chance100 = (10,10,10,10,10,10,10,10,10,10,25,50,75,100)
     chars = {char1: 0, char2: 0, char3: 0, 'others': 0}
     for i in range(0,keys):
-    	keyn += 1
-	    frags = 20
-    	if random <= (chance100[keyn]/100):    
-	        frags = 100
+        keyn += 1
+        frags = 20
+        if random <= (chance100[keyn]/100):    
+            frags = 100
             keyn = 0
         chance = random()
         if chance <= 0.40:
