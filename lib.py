@@ -98,7 +98,7 @@ def getRecipe(nome, main_qty):
             'menu_aliança': {
                 "bife e ovo de frigideira": [0,0], "medalhão de carne":  [0,0],
                 "salada italiana":  [0,0], "espeto de carne gourmet":  [0,0], "curry de coelho":  [0,0],
-                "camarões salteados": [0,0], "ensopado de ostra": [0,0],
+                "camarões salteados": [0,0], "ensopado de ostra": [0,0], "atum grelhado": [0,0],
             },
 			 
             #navio
@@ -191,8 +191,139 @@ def effectiviness(life: int, red: float):
     red = 1-(red/100)
     efet = round(life/(life*red), 5)
     efet_life = life*efet
-    return f"```Efetividade da Vida: {efet:.2f} \nVida Efetiva: {int(efet_life)}```"
- 
+    return f"```Efetividade da Vida: {efet} \nVida Efetiva: {int(efet_life)}```"
+    
+def sorteioSkin(type):
+    skins = {
+        'gold': ['Hundred Plan - Kuro',
+                    'Lone Wolf - Smoker'],
+
+        'silver': ['Red Summer - Nami', 
+                    'Okama - Sanji',
+                    'Boin Island - Usopp',
+                    'Rumbar Pirates - Brook',],
+                    
+        'bronze': ['Sun Pirates - Kuroobi',
+                    'Thriller - Jango',
+                    'Original - Mohji',
+                    'Acrobatic - Cabaji',
+                    'Sun Pirates - Hatchan'],
+    }
+    skins_ship = {
+        'gold': ['Baris - Ship Skin',],
+
+        'silver': ['Venomous - Ship Skin',
+                    'Turquoise - Ship Skin',
+                    'Vermilion - Ship Skin',
+                    'Exotic - Ship Skin',],
+                    
+        'bronze': ['Ashes - Ship Skin',
+                    'Blanco - Ship Skin',
+                    'Quartz - Ship Skin',
+                    'Ruby - Ship Skin',
+                    'Topaz - Ship Skin',],
+    }
+    skins_denden = {
+        'gold': ['Caracol do Luffy'],
+
+        'silver': [	'Caracol de Aniversario',
+                    'Caracol dos Namorados',],
+
+        'bronze': ['Caracol do Buchi',
+                    'Caracol do Pearl',
+                    'Caracol do Kuro',
+                    'Caracol do Kuroobi',
+                    'Caracol do Daddy',
+                    'Caracol do Buggy',
+                    'Caracol do Alvida',
+                    'Caracol Padrão',],
+    }
+    if type == 'ship':
+        skin_type = skins_ship
+    elif type == 'denden':
+        skin_type = skins_denden
+    elif type == 'skin':
+        skin_type = skins
+    else:
+        return ('Erro', 'Tipo invalido')
+    chances = {'gold': 20, 'silver': 55,'bronze': 100}
+    n_random = random()
+    if n_random <= chances['gold']/100:
+        tier = 'gold'
+    elif n_random <= chances['silver']/100:
+        tier = 'silver'
+    elif n_random <= chances['bronze']/100:
+        tier = 'bronze'
+    else:
+        return 'Erro'
+    if len(skin_type[tier]) <= 0:
+        return sorteioSkin(type)
+    else:
+        skin_choosen = choice(skin_type[tier])
+        #return (tier, 'Skin desse Tier Indisponivel, o sorteio iria ocorrer novamente.')
+    return (tier.capitalize(), skin_choosen)
+
+def BuscaHorarios():
+    conn = sqlite3.connect('rocket.db')
+    cursor = conn.cursor()
+    infos = cursor.execute("SELECT * FROM horarios")
+    info_list = []
+    for info in infos:
+        info_list.append(info)
+    info_list = sorted(info_list, key = lambda i: i[2])
+    return info_list
+
+def AdicionarMembrosDB(dados):
+    # conectando...
+    conn = sqlite3.connect('rocket.db')
+    # definindo um cursor
+    cursor = conn.cursor()
+    cursor.executemany("""
+    INSERT INTO membros (id, nome, perm)
+    VALUES (?,?,?)
+    """, (dados,))
+    conn.commit()
+    conn.close()
+
+def BuscarPermissao(id, nome):
+    conn = sqlite3.connect('rocket.db')
+    cursor = conn.cursor()
+
+    cursor.execute(
+        'SELECT * FROM membros WHERE id = ?', (id,))
+
+    x = cursor.fetchone()
+    if x == None:
+        AdicionarMembrosDB((id, nome, 0))
+        print('Membro Não existente. Adicionado')
+        return BuscarPermissao(id, nome)
+    conn.close()
+    return x
+
+def ModificaPermissao(id, nome, perm):
+    conn = sqlite3.connect('rocket.db')
+    cursor = conn.cursor()
+    skins_types = ['skin', 'ship', 'denden']
+    dados = BuscarPermissao(id, nome)  
+    cursor.execute("""
+    UPDATE membros
+    SET perm = ?
+    WHERE id = ?
+    """, (perm, id))
+    conn.commit()
+
+    conn.close()
+        
+def QuestInfo(quest='list'):
+    text = ''
+    print(quest)
+    if quest == 'list':
+        for i in [*quests]:
+            text += f'{i}\n'
+        return text
+    else:    
+        return quests[quest.lower()]
+
 def InfoCharacter(name):
     char = chars[name]
     text = f"""```
@@ -209,10 +340,10 @@ def BauRot(char1, char2, char3, keys):
     chance100 = (10,10,10,10,10,10,10,10,10,10,25,50,75,100)
     chars = {char1: 0, char2: 0, char3: 0, 'others': 0}
     for i in range(0,keys):
-        keyn += 1
-	frags = 20
-        if random <= chance100[keyn]/100:
-            frags = 100
+    	keyn += 1
+	    frags = 20
+    	if random <= (chance100[keyn]/100):    
+	        frags = 100
             keyn = 0
         chance = random()
         if chance <= 0.40:
@@ -236,7 +367,7 @@ def Boosts(start,end,try_cost, sky, wise, crimson):
         boost = start_boost
         while boost < final_boost:
             for j in range(0,cap[boost]):
-                sorteio = random
+                sorteio = random()
                 if sorteio <= (chances[boost]/100) or j+1 == cap[boost]:
                     tent += 1
                     if boost < 4:
@@ -265,3 +396,44 @@ def Boosts(start,end,try_cost, sky, wise, crimson):
     for i in range(0,3):
         text += f'{cristais_name[i]}: {cristais[i]:.2f}\n'
     return text
+
+
+
+#PXG
+def getStones(increase,target,bonus=False):
+    stones = 0
+    skip = 0
+    for i in range(0,target):
+        if skip:
+            skip -= 1
+            continue
+        stones += 1+(i//increase)
+        if bonus == True and i < 9:
+            skip += bonus
+    return stones
+
+
+
+def CelebiDecoder(startx, starty, code):
+    posx = []
+    posy = []
+    var = ''
+    for i in range(0,len(code)):
+        if not code[i].isdigit():
+            posx.append(code[i])
+            if i != 0:
+                posy.append(var)
+            var = ''
+        else:
+            var += code[i]
+    posy.append(var)
+    code = posx,posy
+    text = ''
+    for i in range(0,len(code[0])):
+        x = ord(code[0][i])-96-1
+        y = int(code[1][i])-1
+        text += f"{startx+x}, {starty+y}\n"
+    return text
+
+
+
