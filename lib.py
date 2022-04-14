@@ -210,10 +210,10 @@ def BauRot(char1, char2, char3, keys):
     chars = {char1: 0, char2: 0, char3: 0, 'others': 0}
     for i in range(0,keys):
         frags = 20
-        if randint(1,100) <= chance100[keyn]:
+        if randint(0,100) <= chance100[keyn]:
             frags = 100
             keyn = 13
-        chance = randint(1,100)
+        chance = randint(0,100)
         if chance <= 40:
             choosen = choice([char1,char2,char3])
             chars[choosen] += frags
@@ -239,7 +239,7 @@ def Boosts(start,end,try_cost, sky, wise, crimson):
         boost = start_boost
         while boost < final_boost:
             for j in range(0,cap[boost]):
-                sorteio = randint(1,100)
+                sorteio = randint(0,100)
                 #print(chances[boost], cap[boost], j+1, sorteio)
                 if sorteio <= chances[boost] or j+1 == cap[boost]:
                     tent += 1
