@@ -1,4 +1,3 @@
-from math import e
 from sqlite3.dbapi2 import Cursor
 from data import *
 from random import random,choice
