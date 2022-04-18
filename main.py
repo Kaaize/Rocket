@@ -110,6 +110,15 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
             \ntente também `!help craft`")
 #----------------Fim do comando Craft
 
+#----------------Começo do comando Find
+    @bot.command(brief="Busca um craft por parte do nome", usage="<texto procurado>")
+    async def find(ctx, nome):
+        if len(nome) >= 3:
+            await ctx.send(Find(nome))
+        else:
+            await ctx.send("Minimo de 3 letras para procura.")
+#----------------Fim do comando Find
+
 #----------------Começo do comando Defense
     @bot.command(brief="Calcula a redução de dano",
                 usage="<armor> <def factor>",
