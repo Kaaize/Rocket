@@ -350,7 +350,7 @@ def BauRot(char1, char2, char3, keys):
         keyn += 1
         frags = 20
 	choice_frags_qty = random()
-        if choice_frags_qty <= (chance100[keyn]/100):    
+	if choice_frags_qty <= (chance100[keyn]/100):    
             frags = 100
             keyn = 0
         choice_tier = random()
