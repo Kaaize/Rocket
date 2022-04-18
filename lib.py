@@ -183,6 +183,13 @@ def getLocal(nome):
             return(k, v[nome])
     return ('outro', '?')
 
+def Find(nome):
+	founds = []
+	for item in crafts:
+		if nome in item:
+			founds.append(item)
+	return " | ".join(founds)
+
 def reduction(arm, valor):
     reduct = arm/(valor+arm)
     return f"```Redução de dano: {reduct*100}%```"
