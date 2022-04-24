@@ -114,10 +114,11 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
     @bot.command(brief="Busca um craft por parte do nome", usage="<texto procurado>")
     async def find(ctx, nome):
         if len(nome) >= 3:
+            msg = Find(nome)
             if msg == '':
                 await ctx.send("Nenhum item encontrado")
             else:
-                await ctx.send(f'```{Find(nome)}```')
+                await ctx.send(f'```{msg}```')
         else:
             await ctx.send("Minimo de 3 letras para procura.")
 #----------------Fim do comando Find
@@ -173,6 +174,19 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
         text += '```'
         await ctx.send(text)
 #----------------Fim do comando Bau
+
+#----------------Começo do Comando Keys
+    @bot.command(brief="Média de Chaves",
+                usage="<chance> <frags_target>",
+                description="Calcula a média de chaves necessária para conseguir X fragmentos")
+    async def keys(ctx, chance: float, target: int):
+        text = GetKeys(chance, target)
+        keys = text[0]
+        min = text[1]
+        max = text[2]
+        await ctx.send(f'```Média de Chaves: {keys} \nMinimo: {min}  \nMáximo: {max}```')
+        
+#----------------Fim do comando Keys
 
 #----------------Começo do Comando Boost
     @bot.command(brief="Mostra a Média de preço para boostar um item de x até y",

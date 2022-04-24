@@ -349,10 +349,10 @@ def BauRot(char1, char2, char3, keys):
     for i in range(0,keys):
         keyn += 1
         frags = 20
-	choice_frags_qty = random()
-	if choice_frags_qty <= (chance100[keyn]/100):    
-            frags = 100
-            keyn = 0
+    choice_frags_qty = random()
+    if choice_frags_qty <= (chance100[keyn]/100):    
+        frags = 100
+        keyn = 0
         choice_tier = random()
         if choice_tier <= 0.40:
             choosen = choice([char1,char2,char3])
@@ -360,6 +360,37 @@ def BauRot(char1, char2, char3, keys):
         else:
             chars['others'] += frags
     return chars
+
+def GetKeys(chance, frags_target):
+    total_geral = 0
+    min = 0
+    max = 0
+    loop = 100000
+    for i in range(0,loop):
+        total_frags = 0
+        num_keys = 0
+        key_num = 0
+        chance_100 = [10,10,10,10,10,10,10,10,10,10,25,50,75,100]
+        while total_frags < frags_target:
+            key_num += 1
+            num_keys += 1
+            
+            choice_frags = random()
+            if choice_frags <= chance_100[key_num]/100:
+                frags = 100
+                key_num = 0
+            else:
+                frags = 20
+                
+            choice_char = random()
+            if choice_char <= chance/100:
+                total_frags += frags
+        if num_keys < min or min == 0:
+            min = num_keys
+        if num_keys > max:
+            max = num_keys
+        total_geral += num_keys
+    return total_geral/loop,min,max
 
 def Boosts(start,end,try_cost, sky, wise, crimson):
     chances = [35,30,25,20,22,18,14,10,10,9,8,7]
