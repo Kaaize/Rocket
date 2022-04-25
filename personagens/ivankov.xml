@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Empório Ivankov"
+tier="Diamante"
+tags="Lutador;Suporte;Fruta do diabo"
+base_health="3000"
+vitalidade="256;279;302;325;347"
+defense="4900"
+/>

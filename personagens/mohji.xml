@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Mohji"
+tier="Bronze"
+tags="Especialista;Bruiser"
+base_health="3000"
+vitalidade="252;262;273;287;301;325"
+defense="3200"
+/>

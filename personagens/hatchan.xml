@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Hatchan"
+tier="Bronze"
+tags="Cortante;Suporte;Homem-Peixe"
+base_health="2600"
+vitalidade="234;243;253;266;279;302"
+defense="4000"
+/>

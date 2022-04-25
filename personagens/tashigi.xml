@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Tashigi"
+tier="Prata"
+tags="Cortante;DPS;Marinha"
+base_health="2600"
+vitalidade="234;250;266;282;302;324;347"
+defense="4000"
+/>

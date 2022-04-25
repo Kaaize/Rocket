@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Smoker"
+tier="Ouro"
+tags="Cortante;Tanque;Marinha"
+base_health="3000"
+vitalidade="270;396;322;348;375;401"
+defense="2800"
+/>

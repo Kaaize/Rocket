@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Franky"
+tier="Ouro"
+tags="Atirador;Bruiser;Chapéu de Palha"
+base_health="3000"
+vitalidade="252;276;301;325;350"
+defense="3200"
+/>

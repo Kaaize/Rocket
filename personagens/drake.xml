@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="X-Drake"
+tier="Ouro"
+tags="Lutador;Bruiser;Supernova;Fruta do Diabo"
+base_health="3000"
+vitalidade="252;276;301;325;350;374"
+defense="4000"
+/>

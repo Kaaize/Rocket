@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Wapol"
+tier="Prata"
+tags="Atirador;Tanque;Realeza;Fruta do Diabo"
+base_health="3000"
+vitalidade="252;269;287;304;325;350"
+defense="2800"
+/>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Nami"
+tier="Ouro"
+tags="Especialista;DPS;Chapéu de Palha"
+base_health="2000"
+vitalidade="180;197;215;232;250"
+defense="6500"
+/>

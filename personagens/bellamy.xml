@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Bellamy"
+tier="Ouro"
+tags="Lutador;DPS"
+base_health="2600"
+vitalidade="234;256;279;302;325;347"
+defense="4000"
+/>

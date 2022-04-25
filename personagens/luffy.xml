@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data
+name="Monkey D. Luffy"
+tier="Ouro"
+tags="Lutador;Bruiser;Chapéu de Palha;Supernova;Fruta do Diabo"
+base_health="3000"
+vitalidade="252;276;301;325;350"
+defense="3200"
+/>
