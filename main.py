@@ -251,7 +251,7 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
 
 #----------------INICIALIZAÇÃO DO BOT
     bot.loop.create_task(background_task())
-    bot.run("NTcyNDkzOTYyMzA1MDc3MjU5.XMdGjQ.AcUa7paHohzF1DVOrXJBNGsPBec")
+    bot.run("Token_aqui")
 
 #----------------EXECUÇÃO
 main()
