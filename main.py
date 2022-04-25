@@ -2,6 +2,10 @@ from discord.ext.commands.errors import BadArgument, BadBoolArgument
 from lib import *
 from discord.ext import commands
 import discord
+import asyncio
+from datetime import datetime, time, timedelta
+from math import ceil
+
 def main():
     intents = discord.Intents.default()
     intents.members = True
@@ -34,7 +38,7 @@ def main():
                 para atingir o level desejado. \nTIERS: \nDIAMANTE: 0.5 \nOURO: 1 \nPRATA: 2 \nBRONZE: 3")
     async def getpots(ctx, current: int, target: int, tier: float):
         if target < 1000:
-                await ctx.send(getPots(current,target,tier))
+                await ctx.send(GetPots(current,target,tier))
         else:
             await ctx.send("Level muito alto")
         
@@ -51,7 +55,7 @@ def main():
                 description="Calcula o level atingido ao usar a quantidade informada de poções. \
                 \nTIERS: \nDIAMANTE: 0.5 \nOURO: 1 \nPRATA: 2 \nBRONZE: 3")
     async def getlvl(ctx, current: int, grande: int, media: int, pequena: int, tier: float):
-        await ctx.send(getLvl(current,grande, media, pequena, tier))
+        await ctx.send(GetLvl(current,grande, media, pequena, tier))
 
     @getlvl.error
     async def getlvl_error(ctx, error):
@@ -81,7 +85,7 @@ def main():
             custo = 0
             msg = ''
             try:
-                x = getRecipe(nome.lower(), qty)
+                x = GetRecipe(nome.lower(), qty)
                 for local, recipes in x.items():
                     for ing, qty in recipes.items():
                         if isinstance(qty[0], int) and qty[0] > 0:
@@ -111,50 +115,26 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
 #----------------Fim do comando Craft
 
 #----------------Começo do comando Find
+
     @bot.command(brief="Busca um craft por parte do nome", usage="<texto procurado>")
     async def find(ctx, nome):
         if len(nome) >= 3:
             msg = Find(nome)
+            print(msg)
             if msg == '':
                 await ctx.send("Nenhum item encontrado")
             else:
-                await ctx.send(f'```{msg}```')
+                await ctx.send(f'```{Find(nome)}```')
         else:
             await ctx.send("Minimo de 3 letras para procura.")
 #----------------Fim do comando Find
-
-#----------------Começo do comando Defense
-    @bot.command(brief="Calcula a redução de dano",
-                usage="<armor> <def factor>",
-                description="Calcula a redução de dano")
-    async def defense(ctx, armor: int, deff: int):
-        await ctx.send(reduction(armor,deff))
-
-    @defense.error
-    async def defense_error(ctx, error):
-        if isinstance(error, BadArgument):
-            await ctx.send("Argumento invalido, tente !help defense")
-#----------------Fim do comando Defense
-
-#----------------Começo do comando Effect
-    @bot.command(brief="Calcula a vida efetiva",
-                usage="<life> <dmg reduction>",
-                description="Calcula a vida efetiva")
-    async def effect(ctx, life: int, red: float):
-        await ctx.send(effectiviness(life, red))
-
-    @effect.error
-    async def effect_error(ctx, error):
-        if isinstance(error, BadArgument):
-            await ctx.send("Argumento invalido, tente !help effect")
-#----------------Fim do comando Effect
 
 #----------------Começo do Comando InfoChar
     @bot.command(brief="Mostra informações sobre um personagem",
                 usage="<char>",
                 description="Mostra informações de um personagem.")
     async def infochar(ctx, name):
-        await ctx.send(InfoCharacter(name))
+        await ctx.send(GetInfo(name))
         
     @infochar.error
     async def infochar_error(ctx, error):
@@ -181,7 +161,7 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
                 description="Calcula a média de chaves necessária para conseguir X fragmentos")
     async def keys(ctx, chance: float, target: int):
         text = GetKeys(chance, target)
-        keys = text[0]
+        keys = ceil(text[0])
         min = text[1]
         max = text[2]
         await ctx.send(f'```Média de Chaves: {keys} \nMinimo: {min}  \nMáximo: {max}```')
@@ -190,7 +170,7 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
 
 #----------------Começo do Comando Boost
     @bot.command(brief="Mostra a Média de preço para boostar um item de x até y",
-                usage="<boost_start> <boost_end> <try_cost> <sky_price> <wise_price> <crimson_price>",
+                usage="<boost_start> <boost_end> <try_cost> <sky_pric> <wise_price> <crimson_price>",
                 description="Calcula o preço Médio para boostar um item de X até Y")
     async def boost(ctx, start: int, end: int, try_cost: int, sky: float, wise: float, crimson: float):
             text = Boosts(start, end, try_cost, sky, wise, crimson)
@@ -202,20 +182,76 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
             await ctx.send("Argumento invalido.")
 #----------------Fim do comando Boost
 
+#----------------Fim do comando Cargo
+    @bot.command(brief='Cargo Evento')
+    async def cargo(ctx):
+        role = discord.utils.find(lambda r: r.name == 'Evento', ctx.message.guild.roles)
+        user = ctx.message.author
+        if role not in ctx.author.roles:
+            await user.add_roles(role)
+            await ctx.send(f'{user.mention} Cargo Adicionado')
+        else:
+            await user.remove_roles(role)
+            await ctx.send(f'{user.mention} Cargo Removido')
+#----------------Fim do comando Cargo
+
+#---------------------------------PxG Start
+#---------------------------------Quantidade/Preço Boost
+    @bot.command(brief='Stones necessárias')
+    async def stones(ctx,boost: int, now: int, target: int, price: int, bonus=False):
+        result = GetStones(boost,target,bonus)-GetStones(boost,now,bonus)
+        await ctx.send(f'Stones: {result} | Preço: {result*price//1000}K')
+
+#---------------------------------Celebi Decoder
+    @bot.command(brief='Decodificador Celebi')
+    async def celebi(ctx, posx: int, posy: int, code):
+        await ctx.send(CelebiDecoder(posx,posy,code))
+
+#---------------------------------PxG End
+
+#---------------------------------    
+    async def evento(name, time):  
+        await bot.wait_until_ready()  
+        channel = discord.utils.get(bot.get_all_channels, name='bot_commands')
+        msg = f'<@&930481857550778368> {name} em {time} Minutos!'
+        print("Evento")
+        await channel.send(msg)
+
+    @bot.event
+    async def background_task():
+        while True:
+            horarios = GetEvents()
+            antecedencia = 15
+            for i in horarios:
+                agora = datetime.utcnow() + timedelta(hours = -3)
+                if agora.weekday() == i[4] or i[4] == -1:
+                    event_time = datetime.combine(agora.date(), time(i[1],i[2],i[3]))
+                    target_time = event_time + timedelta(minutes=-antecedencia)
+                    seconds_until_target = (target_time - agora).total_seconds()
+                    if seconds_until_target >= 0:
+                        name = i[0].capitalize()
+                        await asyncio.sleep(seconds_until_target)
+                        await evento(name, antecedencia)
+            agora = datetime.utcnow() + timedelta(hours = -3)
+            amanha = datetime.combine(agora.date() + timedelta(days=1), time(0))
+            seconds = (amanha - agora).total_seconds()
+            await asyncio.sleep(seconds)
+#---------------------------------
+
     @bot.event
     async def on_message(message):
 
             if message.channel.name == 'bot_commands':
                 await bot.process_commands(message)
             if message.channel.name == 'votação':
-                emotes = ['🟢']
+                emotes = ['👍','👎']
                 for i in emotes:
                     await message.add_reaction(i)
 
 
 #----------------INICIALIZAÇÃO DO BOT
-    bot.run("bot_key")
-
+    bot.loop.create_task(background_task())
+    bot.run("NTcyNDkzOTYyMzA1MDc3MjU5.XMdGjQ.AcUa7paHohzF1DVOrXJBNGsPBec")
 
 #----------------EXECUÇÃO
 main()

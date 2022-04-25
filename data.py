@@ -1,3 +1,5 @@
+from datetime import time
+
 locais = {
     'geladeira' : {
         'tomate':10, 'cogumelo':20, 'ovo':10, 'bacon':10, 'folha verde':15, 'leite':10, 'agua':5,
@@ -43,6 +45,8 @@ locais = {
         "curry de coelho": 0,
         "camarões salteados": 0,
         "ensopado de ostra": 0,
+        "atum grelhado": 0,
+        "paella": 0,
     },
 
     'geladeira_aliança': {
@@ -508,7 +512,31 @@ crafts = {
                     "cebola": 1,
                     "alho": 1,
                 },
-
+            #Nivel 4
+                "atum grelhado": {
+                    "azeite": 2,
+                    "limão": 2,
+                    "alho": 2,
+                    "atum": 5,
+                    "pimenta": 2,
+                    "folha verde":2,
+                    "alface": 4,
+                    "vinho branco":1,
+                    "manteiga":2,
+                },
+                "paella": {
+                    "camarão cru": 5,
+                    "lagosta crua": 3,
+                    "arroz": 2,
+                    "folha verde": 1,
+                    "tomate": 1,
+                    "peixe cru": 1,
+                    "azeite": 1,
+                    "pimenta": 1,
+                    "agua": 3,
+                    "sal": 1,
+                },
+            #Nivel 5
         #Baratie
             "baratie": {
                 "sushi": 1,
@@ -2450,7 +2478,7 @@ chars = {
             'tier': 'Prata',
             'tags': ['DPS', 'Cortante'],
             'life': 2600,
-            'vit': [[234, 250, 266, 282, 302, 325],],
+            'vit': [234, 250, 266, 282, 302, 325],
             'def': 4000},
         'mr. 2': {
             'name': 'Mr. 2 - Bon Kurei',
@@ -2519,9 +2547,16 @@ chars = {
             'name': 'Vinsmoke Niji',
             'tier': 'Ouro',
             'tags': ['DPS', 'Atirador', 'Realeza'],
-            'life': 2000,
-            'vit': [171, 188, 204, 221, 238, 254],
-            'def': 8800},
+            'life': 2400,
+            'vit': [180, 197, 215, 232, 250, 267],
+            'def': 6500},
+	'van': {
+            'name': 'Van Augur',
+            'tier': 'Ouro',
+            'tags': ['DPS', 'Atirador'],
+            'life': 2400,
+            'vit': [180, 197, 215, 232, 250, 267],
+            'def': 6500},
         'bartolomeo': {
             'name': 'Bartolomeo',
             'tier': 'Ouro',
@@ -2534,7 +2569,7 @@ chars = {
             'tier': 'Ouro',
             'tags': ['DPS', 'Especialista', 'Chapéu de Palha', 'Fruta do Diabo'],
             'life': 2000,
-            'vit': [180, 197, 215, 232, 250],
+            'vit': [216, 237, 258, 279, 300, 321],
             'def': 6500},
         'ryuma':{ 
             'name': 'Ryuma',
@@ -2555,8 +2590,8 @@ chars = {
             'name': 'Portgas D. Ace',
             'tier': 'Diamante',
             'tags': ['DPS', 'Atirador', 'Especialista', 'Fruta do Diabo'],
-            'life': 2000,
-            'vit': [197, 215, 232, 250, 267],
+            'life': 2400,
+            'vit': [237, 258, 279, 300, 321],
             'def': 6500},
         'hancock': {
             'name': 'Boa Hancock',
@@ -2611,8 +2646,8 @@ chars = {
             'name': 'Robin TimeSkip',
             'tier': 'Diamante',
             'tags': ['DPS', 'Especialista', 'Fruta do Diabo', 'Chapéu de Palha'],
-            'life': '2000',
-            'vit': [197, 215, 232, 250, 267],
+            'life': '2400',
+            'vit': [237, 258, 279, 300, 321],
             'def': 6500},
         'usopp ts': {
             'name': 'Usopp TimeSkip',
@@ -2693,7 +2728,7 @@ chars = {
             'tier': 'Ouro',
             'tags': ['Suporte', 'Lutador', 'Chapéu de Palha', 'Fruta do Diabo'],
             'life': 2400,
-            'vit': [216, 237, 258, 279, 300, 321],
+            'vit': [216, 237, 258, 279, 300],
             'def': 6500},
         'brook': {
             'name': 'Brook',
@@ -2722,7 +2757,7 @@ chars = {
             'tier': 'Diamante',
             'tags': ['Suporte', 'Lutador', 'Fruta do Diabo'],
             'life': 3000,
-            'vit': [276, 301, 325, 350, 374],
+            'vit': [256, 279, 302, 325, 347],
             'def': 4900},
         'chopper ts': {
             'name': 'Chopper TS',
@@ -2739,3 +2774,4 @@ chars = {
             'vit': [237, 258, 279, 300, 321],
             'def': 4900},
 }
+

@@ -3,23 +3,24 @@ from sqlite3.dbapi2 import Cursor
 from data import *
 from random import random,choice
 import sqlite3
+import xml.etree.ElementTree as ET
 #----------------FUNÇÕES
-def map(x, in_min, in_max, out_min, out_max):
+def Map(x, in_min, in_max, out_min, out_max):
     return float((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)
 
-def getExp(lv):
+def GetExp(lv):
     lv = lv-1
     return ((50 * lv * lv * lv) - (150 * lv * lv) + (400 * lv)) / 3
 
-def getLvl(current: int, grande: int, media: int, pequena: int, tier: float):
+def GetLvl(current: int, grande: int, media: int, pequena: int, tier: float):
     level = None
     exp_add = (grande*100000) + (media*10000) + (pequena*1000)
     total_exp = current+(exp_add*tier)
     for i in range(0,1001):
-        if total_exp >= getExp(i) and total_exp <= getExp(i+1):
+        if total_exp >= GetExp(i) and total_exp <= GetExp(i+1):
             level = i
-            exp_to_up = getExp(i+1) - getExp(i)
-            exceeded = total_exp - getExp(i)
+            exp_to_up = GetExp(i+1) - GetExp(i)
+            exceeded = total_exp - GetExp(i)
             percent_lvl = (1 - exceeded / exp_to_up) * 100
             return (f"""```Exp Atingida: {total_exp}
 Level Atingido: {level}
@@ -27,9 +28,9 @@ Exp P/ Upar: {exp_to_up-exceeded:0.0f}
 Porcentagem P/ Upar: {percent_lvl:0.0f}```""")
     return (f"""Level maior que 1000.""")
 
-def getPots(current: int, target: int, tier: int):
+def GetPots(current: int, target: int, tier: int):
         pots = {'small':1000*tier,'med':10000*tier,'big':100000*tier}
-        true_needed = getExp(target)-current
+        true_needed = GetExp(target)-current
         needed = true_needed
         big_needed = 0
         med_needed = 0
@@ -51,7 +52,7 @@ Poções Grandes: {big_needed}
 Poções Médias: {med_needed}
 Poções Pequenas: {small_needed}```""")
 
-def getRecipe(nome, main_qty):
+def GetRecipe(nome, main_qty):
     items = {
             #cozinha
             'geladeira': {
@@ -98,7 +99,7 @@ def getRecipe(nome, main_qty):
             'menu_aliança': {
                 "bife e ovo de frigideira": [0,0], "medalhão de carne":  [0,0],
                 "salada italiana":  [0,0], "espeto de carne gourmet":  [0,0], "curry de coelho":  [0,0],
-                "camarões salteados": [0,0], "ensopado de ostra": [0,0], "atum grelhado": [0,0],
+                "camarões salteados": [0,0], "ensopado de ostra": [0,0], "atum grelhado": [0,0], "paella": [0,0],
             },
 			 
             #navio
@@ -157,8 +158,8 @@ def getRecipe(nome, main_qty):
                 },             
     }
     for ing, qty in crafts[nome].items():
-        local = getLocal(ing)[0]
-        price = getLocal(ing)[1]
+        local = GetLocal(ing)[0]
+        price = GetLocal(ing)[1]
         if ing in items[local]:
             items[local][ing][0] += qty*main_qty
             items[local][ing][1] += price*qty*main_qty
@@ -166,7 +167,7 @@ def getRecipe(nome, main_qty):
             items[local][ing][0] = qty*main_qty
             items[local][ing][1] = price*qty*main_qty
         if ing in crafts:
-            for place, recipe in getRecipe(ing, qty*main_qty).items():
+            for place, recipe in GetRecipe(ing, qty*main_qty).items():
                 for subing, subqty in recipe.items():
                     if subing in items[place]:
                         items[place][subing][0] += subqty[0]
@@ -177,7 +178,7 @@ def getRecipe(nome, main_qty):
 
     return items
 
-def getLocal(nome):
+def GetLocal(nome):
     for k, v in locais.items():
         if nome.lower() in v:
             return(k, v[nome])
@@ -190,156 +191,33 @@ def Find(nome):
 			founds.append(item)
 	return " | ".join(founds)
 
-def reduction(arm, valor):
-    reduct = arm/(valor+arm)
-    return f"```Redução de dano: {reduct*100}%```"
+def GetEvents():
+    tree = ET.parse('eventos.xml')
+    root = tree.getroot()
+    dias = {'segunda': 0, 'terça':1, 'quarta': 2, 'quinta': 3, 'sexta': 4, 'sabado': 5, 'domingo': 6, 'todos': -1}
+    info = []
+    for k,v in root.items():
+        splited = (v.split(';'))
+        for event in splited:
+            temp = event.split(',')
+            for i in range(1,4):
+                temp[i] = int(temp[i])
+            temp.append(dias[k])
+            info.append(temp)
+    sorted_list = sorted(info, key = lambda i: i[4])
+    return sorted_list
 
-def effectiviness(life: int, red: float):
-    red = 1-(red/100)
-    efet = round(life/(life*red), 5)
-    efet_life = life*efet
-    return f"```Efetividade da Vida: {efet} \nVida Efetiva: {int(efet_life)}```"
-    
-def sorteioSkin(type):
-    skins = {
-        'gold': ['Hundred Plan - Kuro',
-                    'Lone Wolf - Smoker'],
-
-        'silver': ['Red Summer - Nami', 
-                    'Okama - Sanji',
-                    'Boin Island - Usopp',
-                    'Rumbar Pirates - Brook',],
-                    
-        'bronze': ['Sun Pirates - Kuroobi',
-                    'Thriller - Jango',
-                    'Original - Mohji',
-                    'Acrobatic - Cabaji',
-                    'Sun Pirates - Hatchan'],
-    }
-    skins_ship = {
-        'gold': ['Baris - Ship Skin',],
-
-        'silver': ['Venomous - Ship Skin',
-                    'Turquoise - Ship Skin',
-                    'Vermilion - Ship Skin',
-                    'Exotic - Ship Skin',],
-                    
-        'bronze': ['Ashes - Ship Skin',
-                    'Blanco - Ship Skin',
-                    'Quartz - Ship Skin',
-                    'Ruby - Ship Skin',
-                    'Topaz - Ship Skin',],
-    }
-    skins_denden = {
-        'gold': ['Caracol do Luffy'],
-
-        'silver': [	'Caracol de Aniversario',
-                    'Caracol dos Namorados',],
-
-        'bronze': ['Caracol do Buchi',
-                    'Caracol do Pearl',
-                    'Caracol do Kuro',
-                    'Caracol do Kuroobi',
-                    'Caracol do Daddy',
-                    'Caracol do Buggy',
-                    'Caracol do Alvida',
-                    'Caracol Padrão',],
-    }
-    if type == 'ship':
-        skin_type = skins_ship
-    elif type == 'denden':
-        skin_type = skins_denden
-    elif type == 'skin':
-        skin_type = skins
-    else:
-        return ('Erro', 'Tipo invalido')
-    chances = {'gold': 20, 'silver': 55,'bronze': 100}
-    n_random = random()
-    if n_random <= chances['gold']/100:
-        tier = 'gold'
-    elif n_random <= chances['silver']/100:
-        tier = 'silver'
-    elif n_random <= chances['bronze']/100:
-        tier = 'bronze'
-    else:
-        return 'Erro'
-    if len(skin_type[tier]) <= 0:
-        return sorteioSkin(type)
-    else:
-        skin_choosen = choice(skin_type[tier])
-        #return (tier, 'Skin desse Tier Indisponivel, o sorteio iria ocorrer novamente.')
-    return (tier.capitalize(), skin_choosen)
-
-def BuscaHorarios():
-    conn = sqlite3.connect('rocket.db')
-    cursor = conn.cursor()
-    infos = cursor.execute("SELECT * FROM horarios")
-    info_list = []
-    for info in infos:
-        info_list.append(info)
-    info_list = sorted(info_list, key = lambda i: i[2])
-    return info_list
-
-def AdicionarMembrosDB(dados):
-    # conectando...
-    conn = sqlite3.connect('rocket.db')
-    # definindo um cursor
-    cursor = conn.cursor()
-    cursor.executemany("""
-    INSERT INTO membros (id, nome, perm)
-    VALUES (?,?,?)
-    """, (dados,))
-    conn.commit()
-    conn.close()
-
-def BuscarPermissao(id, nome):
-    conn = sqlite3.connect('rocket.db')
-    cursor = conn.cursor()
-
-    cursor.execute(
-        'SELECT * FROM membros WHERE id = ?', (id,))
-
-    x = cursor.fetchone()
-    if x == None:
-        AdicionarMembrosDB((id, nome, 0))
-        print('Membro Não existente. Adicionado')
-        return BuscarPermissao(id, nome)
-    conn.close()
-    return x
-
-def ModificaPermissao(id, nome, perm):
-    conn = sqlite3.connect('rocket.db')
-    cursor = conn.cursor()
-    skins_types = ['skin', 'ship', 'denden']
-    dados = BuscarPermissao(id, nome)  
-    cursor.execute("""
-    UPDATE membros
-    SET perm = ?
-    WHERE id = ?
-    """, (perm, id))
-    conn.commit()
-
-    conn.close()
-        
-def QuestInfo(quest='list'):
-    text = ''
-    print(quest)
-    if quest == 'list':
-        for i in [*quests]:
-            text += f'{i}\n'
-        return text
-    else:    
-        return quests[quest.lower()]
-
-def InfoCharacter(name):
-    char = chars[name]
+def GetInfo(name):
+    tree = ET.parse(f'personagens/{name}.xml')
+    root = tree.getroot()
+    info = {}
     text = f"""```
-Nome: {char['name']}
-Tier: {char['tier']}
-Tags: {char['tags']}
-Vida Base: {char['life']}
-Vida/Vit: {char['vit']}
-Fator de Defesa: {char['def']}```"""
+Nome: {root.attrib['name']}
+Tier: {root.attrib['tier']}
+Tags: {' | '.join(root.attrib['tags'].split(";"))}
+Vida Base: {root.attrib['base_health']}
+Vida/Vita: {' | '.join(root.attrib['vitalidade'].split(';'))}
+Defesa: {root.attrib['defense']}```"""
     return text
 
 def BauRot(char1, char2, char3, keys):
@@ -349,12 +227,11 @@ def BauRot(char1, char2, char3, keys):
     for i in range(0,keys):
         keyn += 1
         frags = 20
-    choice_frags_qty = random()
-    if choice_frags_qty <= (chance100[keyn]/100):    
-        frags = 100
-        keyn = 0
-        choice_tier = random()
-        if choice_tier <= 0.40:
+        if random() <= (chance100[keyn]/100):    
+            frags = 100
+            keyn = 0
+        chance = random()
+        if chance <= 0.40:
             choosen = choice([char1,char2,char3])
             chars[choosen] += frags
         else:
@@ -439,7 +316,7 @@ def Boosts(start,end,try_cost, sky, wise, crimson):
 
 
 #PXG
-def getStones(increase,target,bonus=False):
+def GetStones(increase,target,bonus=False):
     stones = 0
     skip = 0
     for i in range(0,target):
