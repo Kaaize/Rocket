@@ -1,9 +1,8 @@
-from math import e
-from sqlite3.dbapi2 import Cursor
 from data import *
 from random import random,choice
-import sqlite3
 import xml.etree.ElementTree as ET
+from PIL import Image, ImageFont, ImageDraw
+
 #----------------FUNÇÕES
 def Map(x, in_min, in_max, out_min, out_max):
     return float((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)
@@ -204,21 +203,56 @@ def GetEvents():
                 temp[i] = int(temp[i])
             temp.append(dias[k])
             info.append(temp)
-    sorted_list = sorted(info, key = lambda i: i[4])
+    sorted_list = sorted(info, key = lambda i: i[1])
     return sorted_list
 
-def GetInfo(name):
+def CreateImageInfo(name):
+    #Abrindo e obtendo info do XML
     tree = ET.parse(f'personagens/{name}.xml')
     root = tree.getroot()
-    info = {}
-    text = f"""```
-Nome: {root.attrib['name']}
-Tier: {root.attrib['tier']}
-Tags: {' | '.join(root.attrib['tags'].split(";"))}
-Vida Base: {root.attrib['base_health']}
-Vida/Vita: {' | '.join(root.attrib['vitalidade'].split(';'))}
-Defesa: {root.attrib['defense']}```"""
-    return text
+    infos = root.attrib
+    #Imagem base, fonte e cor
+    base_image = Image.open('infochar/base/base.png')
+    title_font = ImageFont.truetype('infochar/base/font.TTF', 18)
+    COR = (255,255,255)
+    TIERS = {'Bronze':(191,137,112), 'Prata':(178,169,173), 'Ouro':(255,215,0), 'Diamante':(185,242,255)}
+    BRANCO = (255,255,255)
+    
+    #Adição da foto
+    portrait = Image.open(f'infochar/{name.upper()}_medal.png').convert('RGBA')
+    text_img = Image.new('RGBA', (340,230), (0,0,0,0))
+    text_img.paste(base_image, (0,0))
+    text_img.paste(portrait, (12,8), mask=portrait)
+     
+    #Adição das classes
+    icons = infos['tags'].split(";")
+    for i in range(0,len(icons)):
+        icon = Image.open(f"infochar/base/{icons[i].lower()}.png").convert('RGBA')
+        text_img.paste(icon, (130+(i*30),75), mask=icon)
+    
+    #colocando base_image de volta como imagem variavel a ser usada
+    base_image = text_img
+
+        #Adição do Nome
+    nome_separado = infos['name'].split()
+    nome = ['','']
+    stop = 0
+    for i in nome_separado:
+        if len(nome[0]) + len(i) < 23 and stop != 1:
+            nome[0] += f'{i} '
+        else:
+            stop = 1
+            nome[1] += f'{i} '
+
+    image_editable = ImageDraw.Draw(base_image)
+    image_editable.text((130,10),nome[0], TIERS[infos['tier']], font=title_font)
+    image_editable.text((130,30),nome[1], TIERS[infos['tier']], font=title_font)
+    #Atributos
+    image_editable.text((35,127), infos['base_health'], BRANCO, font=title_font)
+    image_editable.text((35,152), ', '.join((infos['vitalidade']).split(';')), BRANCO, font=title_font)
+    #image_editable.text((35,179), infos['speed'], BRANCO, font=title_font)
+    image_editable.text((35,202), infos['defense'], BRANCO, font=title_font)
+    return base_image
 
 def BauRot(char1, char2, char3, keys):
     keyn = 0

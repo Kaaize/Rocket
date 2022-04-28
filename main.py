@@ -4,7 +4,9 @@ from discord.ext import commands
 import discord
 import asyncio
 from datetime import datetime, time, timedelta
-from math import ceil
+import io
+from PIL import Image, ImageFont, ImageDraw
+
 
 def main():
     intents = discord.Intents.default()
@@ -19,17 +21,16 @@ def main():
     
     @bot.event
     async def on_member_join(member):
-        idchannel = 846191030164520970
+        channel = bot.get_channel(846191030164520970)
         msg = f"{member.mention} entrou no Servidor."
-        await bot.get_channel(idchannel).send(msg)
+        await channel.send(msg)
 
     @bot.event
     async def on_member_remove(member):
-        idchannel = 846191030164520970
+        channel = bot.get_channel(846191030164520970)
         msg = f"{member.name} deixou o Servidor."
-        await bot.get_channel(idchannel).send(msg)
+        await channel.send(msg)
 #----------------COMANDOS
-
 
 #----------------Começo do comando GetPots
     @bot.command(brief="Calcula as Poções Necessárias", 
@@ -134,8 +135,12 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
                 usage="<char>",
                 description="Mostra informações de um personagem.")
     async def infochar(ctx, name):
-        await ctx.send(GetInfo(name))
-        
+        image = CreateImageInfo(name)
+        with io.BytesIO() as image_binary:
+                    image.save(image_binary, 'PNG')
+                    image_binary.seek(0)
+                    await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+
     @infochar.error
     async def infochar_error(ctx, error):
         if isinstance(error, BadArgument):
@@ -161,10 +166,10 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
                 description="Calcula a média de chaves necessária para conseguir X fragmentos")
     async def keys(ctx, chance: float, target: int):
         text = GetKeys(chance, target)
-        keys = ceil(text[0])
+        keys = text[0]
         min = text[1]
         max = text[2]
-        await ctx.send(f'```Média de Chaves: {keys} \nMinimo: {min}  \nMáximo: {max}```')
+        await ctx.send(f'```Média de Chaves: {keys:.2f} \nMinimo: {min}  \nMáximo: {max}```')
         
 #----------------Fim do comando Keys
 
@@ -212,9 +217,8 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
 #---------------------------------    
     async def evento(name, time):  
         await bot.wait_until_ready()  
-        channel = discord.utils.get(bot.get_all_channels, name='bot_commands')
+        channel = bot.get_channel(824552982728409089)
         msg = f'<@&930481857550778368> {name} em {time} Minutos!'
-        print("Evento")
         await channel.send(msg)
 
     @bot.event
@@ -251,7 +255,7 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
 
 #----------------INICIALIZAÇÃO DO BOT
     bot.loop.create_task(background_task())
-    bot.run("Token_aqui")
+    bot.run("Token")
 
 #----------------EXECUÇÃO
 main()
