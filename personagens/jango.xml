@@ -2,8 +2,9 @@
 <data
 name="Jango"
 tier="Bronze"
-tags="Atirador;Suporte;Marinha"
+tags="Atirador;Suporte"
 base_health="2000"
 vitalidade="180;187;195;205;215;232"
+speed="260"
 defense="6500"
 />

@@ -5,5 +5,6 @@ tier="Prata"
 tags="Atirador;DPS;Fruta do Diabo"
 base_health="1900"
 vitalidade="171;183;195;207;221;238"
+speed="260"
 defense="8800"
 />

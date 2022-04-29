@@ -5,5 +5,6 @@ tier="Diamante"
 tags="Cortante;DPS;Chapéu de Palha"
 base_health="2600"
 vitalidade="256;279;302;325;347"
+speed="280"
 defense="4000"
 />

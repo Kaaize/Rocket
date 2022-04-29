@@ -250,7 +250,7 @@ def CreateImageInfo(name):
     #Atributos
     image_editable.text((35,127), infos['base_health'], BRANCO, font=title_font)
     image_editable.text((35,152), ', '.join((infos['vitalidade']).split(';')), BRANCO, font=title_font)
-    #image_editable.text((35,179), infos['speed'], BRANCO, font=title_font)
+    image_editable.text((35,177), infos['speed'], BRANCO, font=title_font)
     image_editable.text((35,202), infos['defense'], BRANCO, font=title_font)
     return base_image
 

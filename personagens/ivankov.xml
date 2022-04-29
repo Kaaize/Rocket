@@ -5,5 +5,6 @@ tier="Diamante"
 tags="Lutador;Suporte;Fruta do diabo"
 base_health="3000"
 vitalidade="256;279;302;325;347"
+speed="280"
 defense="4900"
 />

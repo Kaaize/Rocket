@@ -5,5 +5,6 @@ tier="Prata"
 tags="Cortante;Tanque;Fruta do Diabo"
 base_health="3000"
 vitalidade="270;288;307;326;348;375"
+speed="260"
 defense="3200"
 />

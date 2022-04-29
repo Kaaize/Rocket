@@ -5,5 +5,6 @@ tier="Ouro"
 tags="Suporte;Especialista;Realeza;Fruta do Diabo"
 base_health="1900"
 vitalidade="171;188;204;221;238;254"
+speed="260"
 defense="8800"
 />

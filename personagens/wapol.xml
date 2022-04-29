@@ -5,5 +5,6 @@ tier="Prata"
 tags="Atirador;Tanque;Realeza;Fruta do Diabo"
 base_health="3000"
 vitalidade="252;269;287;304;325;350"
+speed="260"
 defense="2800"
 />

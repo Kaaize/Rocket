@@ -5,5 +5,6 @@ tier="Ouro"
 tags="Especialista;DPS;Chapéu de Palha;Fruta do Diabo"
 base_health="2400"
 vitalidade="216;237;258;279;300;321"
+speed="260"
 defense="6500"
 />

@@ -5,5 +5,6 @@ tier="Bronze"
 tags="Lutador;DPS"
 base_health="2600"
 vitalidade="234;243;253;266;279;302"
+speed="300"
 defense="4000"
 />

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <data
-name="Hina"
+name="Dalmatian"
 tier="Ouro"
-tags="Lutador;Bruiser;Marinha;Fruta do Diabo"
+tags="Cortante;Bruiser;Marinha;Fruta do Diabo"
 base_health="3000"
 vitalidade="252;276;301;325;350;374"
 speed="280"

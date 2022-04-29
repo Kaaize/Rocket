@@ -5,5 +5,6 @@ tier="Bronze"
 tags="Lutador;Tanque;Homem-Peixe"
 base_health="3000"
 vitalidade="270;281;292;307;322;348"
+speed="260"
 defense="2800"
 />

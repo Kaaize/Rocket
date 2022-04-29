@@ -5,5 +5,6 @@ tier="Diamante"
 tags="Especialista;DPS;Chapéu de Palha"
 base_health="2000"
 vitalidade="197;215;232;250;267"
+speed="260"
 defense="6500"
 />

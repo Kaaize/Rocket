@@ -2,8 +2,9 @@
 <data
 name="Alvida"
 tier="Bronze"
-tags="Lutador;Suporte;Fruta do Diabo"
+tags="Lutador;Suporte"
 base_health="2400"
 vitalidade="216;225;234;245;258;279"
+speed="260"
 defense="4000"
 />
