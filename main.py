@@ -241,7 +241,7 @@ def main():
 
 #----------------INICIALIZAÇÃO DO BOT
     bot.loop.create_task(background_task())
-    bot.run("NTcyNDkzOTYyMzA1MDc3MjU5.XMdGjQ.ENwjg83IGH0Jggy0R3Pbj8x2Qjs")
+    bot.run("token")
 
 #----------------EXECUÇÃO
 main()
