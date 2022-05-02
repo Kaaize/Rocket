@@ -1,11 +1,12 @@
-from data import *
 from random import random,choice
 import xml.etree.ElementTree as ET
 from PIL import Image, ImageFont, ImageDraw
+import os
+import pathlib
 
+
+PATH = pathlib.Path(__file__).parent.resolve()
 #----------------FUNÇÕES
-def Map(x, in_min, in_max, out_min, out_max):
-    return float((x-in_min) * (out_max-out_min) / (in_max-in_min) + out_min)
 
 def GetExp(lv):
     lv = lv-1
@@ -51,144 +52,111 @@ Poções Grandes: {big_needed}
 Poções Médias: {med_needed}
 Poções Pequenas: {small_needed}```""")
 
-def GetRecipe(nome, main_qty):
-    items = {
-            #cozinha
-            'geladeira': {
-                'tomate':[0,0], 'cogumelo':[0,0], 'ovo':[0,0], 'bacon':[0,0], 'folha verde':[0,0], 'leite':[0,0], 'agua':[0,0],
-				'queijo':[0,0], 'peixe cru':[0,0], 'bife cru':[0,0], 'limão':[0,0], 'vinho barato':[0,0], 'manteiga':[0,0],
-            },
-			 
-			'armario': {
-                'batata':[0,0], 'cebola':[0,0], 'azeite':[0,0], 'alho':[0,0], 'arroz':[0,0], 'farinha':[0,0], 'shoyu':[0,0], 'sal':[0,0],
-				'pimenta':[0,0], 'lata de atum':[0,0],
-            },
-			 
-			'tigela': {'tigela':[0,0]},
-			 
-			'rolo': {'massa':[0,0]},
-			 
-			'corte': {'pasta':[0,0]},
-			 
-			'panela': {
-                'ramen':[0,0], 'arroz cozido':[0,0], 'sopa de vegetais':[0,0], "sopa mista picante":[0,0], "ramen de carne":[0,0], "miso ramen":[0,0], "ramen misto":[0,0],
-				"ramen de galinha":[0,0], "ramen de camarão":[0,0], "lagosta prime":[0,0], "caranguejo cozido":[0,0]
-            },
-				
-			'tabua': {
-                "onigiri":[0,0], "sushi":[0,0], "nigiri":[0,0], "bento japones":[0,0], "dango":[0,0], "waffles":[0,0]
-            },
-			 
-			'forno':{
-                "bife prime":[0,0], "carne de porco gourmet":[0,0], "polvo gourmet com ovos":[0,0], "pizza":[0,0], "frango a parmegiana":[0,0], 
-				"frango a parmegiana com ovos":[0,0]
-            },
-                
-		    'frigideira':{
-                "bife frito":[0,0], "ovo frito":[0,0], "espeto de carne":[0,0], "kakuni japones prime":[0,0], "peixe grelhado gourmet":[0,0],
-				"espeto de peixe japones prime":[0,0], "takoyaki":[0,0], "gyoza":[0,0], "peixe apimentado picante":[0,0],
-                "coxa de frango frito":[0,0], "camarão empanado":[0,0]
-            },
+#Funções para o comando Craft (Start)
+result = {} #variavel responsavel por armazenar todos as informações de craft
+def GetInfo(item, qty):
+    tree = ET.parse('crafts/items.xml')
+    item = Joiner(item)
+    root = tree.getroot()
+    for i in root:
+        if i.get(item):
+            x = (i.tag, item, qty, int(i.get(item))*qty)
+            return x
 
-            'geladeira_aliança': {
-                "bife cru premium": [0,0], "lagosta crua": [0,0], "camarão cru": [0,0], "carne crua de coelho": [0,0], "ostra": [0,0], "alface": [0,0],
-                "vinho branco": [0,0], "trufa branca": [0,0], "creme de leite": [0,0], "atum":[0,0]
-            },
+def GetPlace(item):
+    return GetInfo(item,1)[0]
 
-            'menu_aliança': {
-                "bife e ovo de frigideira": [0,0], "medalhão de carne":  [0,0],
-                "salada italiana":  [0,0], "espeto de carne gourmet":  [0,0], "curry de coelho":  [0,0],
-                "camarões salteados": [0,0], "ensopado de ostra": [0,0], "atum grelhado": [0,0], "paella": [0,0],
-            },
-			 
-            #navio
-            
-            'npc': {
-                #Barco
-                    "tora de madeira":[0,0], "algodão de baixa qualidade":[0,0], "minério de cobre":[0,0], "pólvora":[0,0],
-                    "tora de carvalho": [0,0], "algodão": [0,0], "minério de ferro": [0,0], "pólvora melhorada": [0,0],
-                    "tora de mogno": [0,0], "algodão melhorado": [0,0], "minério de aço": [0,0], "pólvora superior": [0,0],
-                #Cozinha
-                    "carne de porco": [0,0], "perna de galinha": [0,0], "peru": [0,0], "tomate do deserto": [0,0],
-                    "folhas verdes especiais": [0,0], "açucar rosa": [0,0],  "carne de caranguejo": [0,0],
-            },
+def Joiner(nome):
+    return '_'.join(nome.split(' '))
 
-            'refinaria': {
-                "prancha de madeira":[0,0], "lingote de cobre":[0,0], "pano de baixa qualidade":[0,0], "corda de baixa qualidade":[0,0], "prego de cobre":[0,0],
-                "prancha de carvalho":[0,0], "lingote de ferro":[0,0], "pano":[0,0], "corda":[0,0], "prego de ferro":[0,0],
-                "prancha de mogno":[0,0], "lingote de aço":[0,0], "pano melhorado":[0,0], "corda melhorada":[0,0], "prego de aço":[0,0],
-            },
+def Spliter(nome):
+    return ' '.join(nome.split('_')).capitalize()
 
-            'drop': {
-                "cola":[0,0], "cano de arma": [0,0], "bala de canhão": [0,0],
-                "bateria":[0,0], "tanque de ar": [0,0], "liquido inflamavel": [0,0], "cogumelo venenoso": [0,0], "lata de óleo": [0,0],
-                "grande cola": [0,0], "cano de arma superior": [0,0], "bala de canhão de aço": [0,0],
-            },
-
-            'mesa comum': {
-                #barco 1
-                    "canhão1":[0,0], "vela1":[0,0], "casco1":[0,0],
-                #barco 2
-                    "barco2":[0,0], "canhão2":[0,0], "vela2":[0,0], "casco2":[0,0], "espingarda2":[0,0], "tiro de canhão corrente2":[0,0],
-                     "ariete2":[0,0],
-                #barco 3
-                    "barco3":[0,0], "canhão3":[0,0], "vela3":[0,0], "casco3":[0,0], "espingarda3":[0,0], "tiro de canhão corrente3":[0,0], "ariete3":[0,0], 
-                    "metralhadora3":[0,0], "acelerar3":[0,0], "canhão pesado3":[0,0], 
-                #barco 4
-                    "barco4":[0,0], "canhão4":[0,0], "vela4":[0,0], "casco4":[0,0], 
-            },
-
-            'estaleiro': {
-                #Nivel 1
-                    "espingarda4":[0,0], "tiro de canhão corrente4":[0,0], "ariete4":[0,0], "metralhadora4":[0,0], "acelerar4":[0,0], 
-                    "canhão pesado4":[0,0],
-                #Nivel 2 Bronze
-                    "barril explosivo4":[0,0], "barril de óleo4":[0,0], "explosão de velocidade4":[0,0], "reforçar4":[0,0], 
-                #Nivel 2 Prata
-                    "bomba de veneno4":[0,0], "lança chamas4":[0,0], "bombardeiro4":[0,0], "bolha4":[0,0], "sonar4":[0,0], 
-                #Nivel 3     
-                    "barco5":[0,0], "canhão5":[0,0], "vela5":[0,0], "casco5":[0,0], 
-                    "espingarda5":[0,0], "tiro de canhão corrente5":[0,0], "ariete5":[0,0], "metralhadora5":[0,0], "acelerar5":[0,0], 
-                    "canhão pesado5":[0,0],
-            },
-
-			'outro': {
-                "tentaculo de bebe polvo":[0,0], "açucar especial":[0,0], "frango especial":[0,0], "açucar rosa":[0,0],
-                },             
-    }
-    for ing, qty in crafts[nome].items():
-        local = GetLocal(ing)[0]
-        price = GetLocal(ing)[1]
-        if ing in items[local]:
-            items[local][ing][0] += qty*main_qty
-            items[local][ing][1] += price*qty*main_qty
+def GetCraft(item, qty: int):
+    global result
+    info = GetInfo(item,1)
+    tree = ET.parse(f"crafts/{info[0]}/{item}.xml")
+    root = tree.getroot()
+    for k, v in root.attrib.items():
+        v = int(v)
+        info = GetInfo(k, v)
+        if result.get(info[0]):
+            if result[info[0]].get(info[1]):
+                result[info[0]][info[1]][0] += info[2]*qty
+                result[info[0]][info[1]][1] += info[3]*qty
+            else:
+                result[info[0]][info[1]] = [info[2]*qty,info[3]*qty]
         else:
-            items[local][ing][0] = qty*main_qty
-            items[local][ing][1] = price*qty*main_qty
-        if ing in crafts:
-            for place, recipe in GetRecipe(ing, qty*main_qty).items():
-                for subing, subqty in recipe.items():
-                    if subing in items[place]:
-                        items[place][subing][0] += subqty[0]
-                        items[place][subing][1] += subqty[1]
-                    else:
-                        items[place][subing][0] = subqty[0]
-                        items[place][subing][1] = subqty[1]
+            result[info[0]] = {info[1]: [info[2]*qty,info[3]*qty]}
+        #items com crafts dentro do proprio craft
+        nome = Joiner(k)
+        try:
+            if f'{nome}.xml' in os.listdir(f'{PATH}/crafts/{info[0]}'):
+                GetCraft(nome, v*qty)
+        except Exception as e:
+            print('Erro', e)
+    return result
 
-    return items
+def TryImage(path: str):
+    try:
+        return Image.open(path).convert('RGBA')
+    except FileNotFoundError as e:
+        print('Erro', e)
+        return Image.open('blank.png').convert('RGBA')
 
-def GetLocal(nome):
-    for k, v in locais.items():
-        if nome.lower() in v:
-            return(k, v[nome])
-    return ('outro', '?')
+def MontarCraft(nome, qty: int):
+    global result
+    nome = Joiner(nome)
+    GetCraft(nome,qty) #passando as informações pra varival global result, atraves da função GetCraft
+    title_font = ImageFont.truetype('crafts/imgs/font.TTF', 15) #fonte usada
+    size = 2 #tamanho que a imagem vai ser montada (2 inicial, craft + total)
+    line = 0 #posição verical inicial
+    total_price = 0 #preço total
+    largura = 500 #largura da imagem
+    #obtendo a quantidade items para adicionar tamanho vertical a imagem
+    for item in result:
+        size += 1+len(result[item])
+    #criando a imagem e deixando editavel editavel
+    text_img = Image.new('RGBA', (largura,size*45), (0,70,100,255))
+    image_editable = ImageDraw.Draw(text_img)
+    #adicionando nome e quantidade do craft na imagem
+    type = TryImage(f'crafts/imgs/{GetPlace(nome)}/{nome}.png')
+    text_img.paste(type, (largura//2-16,line), mask=type)
+    image_editable.text((largura//2,line+40),str(qty), (255,255,255), font=title_font, anchor="mm")
+    line+=10 #espaçamento vertical
+    for local, craft in result.items():
+        line += 45 #espaçamento vertical
+    
+        #adicionando Local de Aquisição na imagem
+        type = TryImage(f'crafts/imgs/base.png') #tentando carregar imagem do local de aquisição
+        text_img.paste(type, (0,line), mask=type)
+        image_editable.text((largura//2,line+15),local.upper(), (255,255,255), font=title_font, anchor="mm")
+        #passando por cada item para adicionar na imagem
+        for key, value in craft.items(): 
+            line += 45 #espaçamento vertical
+            total_price += value[1] #somando valor total
+            type = TryImage(f'crafts/imgs/{GetPlace(key)}/{key}.png') #tentando carregar imagem do item
+            text_img.paste(type, (10,line), mask=type) #adicionando imagem do item
+
+            #adicionando texto de nome, quantidade e valor do item
+            image_editable.text((45,line+5), Spliter(key), (255,255,255), font=title_font)
+            image_editable.text((320,line+5),f'{str(value[0]).upper()}x', (255,255,255), font=title_font)
+            image_editable.text((420,line+5),f'${str(value[1]).upper()}', (255,255,255), font=title_font)
+    line += 45 #espaçamento pro total
+    #total e zerando a variavel para os proximos usos
+    image_editable.text((largura//2,line),f'${str(total_price).upper()}', (255,255,255), font=title_font, anchor="mm")
+    result = {}
+    return text_img
 
 def Find(nome):
-	founds = []
-	for item in crafts:
-		if nome in item:
-			founds.append(item)
-	return " | ".join(founds)
+    dirs = ['arsenal2','arsenal3','arsenal4','arsenal5','refinaria','cozinheira_aliança']
+    items = ''
+    for i in dirs:
+        for k in os.listdir(f'{PATH}/crafts/{i}'):
+            if nome in k:
+                items += f'{k}\n'
+    return items
+#Funções para o comando Craft (End)
 
 def GetEvents():
     tree = ET.parse('eventos.xml')
@@ -206,34 +174,37 @@ def GetEvents():
     sorted_list = sorted(info, key = lambda i: i[1])
     return sorted_list
 
+#Funções do comand Infochar (Start)
 def CreateImageInfo(name):
     #Abrindo e obtendo info do XML
     tree = ET.parse(f'personagens/{name}.xml')
     root = tree.getroot()
     infos = root.attrib
     #Imagem base, fonte e cor
-    base_image = Image.open('infochar/base/base.png')
-    title_font = ImageFont.truetype('infochar/base/font.TTF', 18)
+    base_image = Image.open('personagens/imgs/base/base.png')
+    title_font = ImageFont.truetype('personagens/imgs/base/font.TTF', 18)
     COR = (255,255,255)
     TIERS = {'Bronze':(191,137,112), 'Prata':(178,169,173), 'Ouro':(255,215,0), 'Diamante':(185,242,255)}
     BRANCO = (255,255,255)
     
     #Adição da foto
-    portrait = Image.open(f'infochar/{name.upper()}_medal.png').convert('RGBA')
+    portrait = TryImage(f'personagens/imgs/{name.capitalize()}_medal.png')
+    #portrait = Image.open(f'personagens/imgs/{name.capitalize()}_medal.png').convert('RGBA')
     text_img = Image.new('RGBA', (340,230), (0,0,0,0))
     text_img.paste(base_image, (0,0))
-    text_img.paste(portrait, (12,8), mask=portrait)
+    text_img.paste(portrait, (13,9), mask=portrait)
      
     #Adição das classes
     icons = infos['tags'].split(";")
     for i in range(0,len(icons)):
-        icon = Image.open(f"infochar/base/{icons[i].lower()}.png").convert('RGBA')
+        icon = TryImage(f"personagens/imgs/base/{icons[i].lower()}.png")
+        #icon = Image.open(f"personagens/imgs/base/{icons[i].lower()}.png").convert('RGBA')
         text_img.paste(icon, (130+(i*30),75), mask=icon)
     
     #colocando base_image de volta como imagem variavel a ser usada
     base_image = text_img
 
-        #Adição do Nome
+    #Adição do Nome
     nome_separado = infos['name'].split()
     nome = ['','']
     stop = 0
@@ -253,55 +224,77 @@ def CreateImageInfo(name):
     image_editable.text((35,177), infos['speed'], BRANCO, font=title_font)
     image_editable.text((35,202), infos['defense'], BRANCO, font=title_font)
     return base_image
+#Funções do comand Infochar (End)
 
-def BauRot(char1, char2, char3, keys):
+def GetFrags(chance, keys):
     keyn = 0
     chance100 = (10,10,10,10,10,10,10,10,10,10,25,50,75,100)
-    chars = {char1: 0, char2: 0, char3: 0, 'others': 0}
+    total_frags = 0
     for i in range(0,keys):
         keyn += 1
         frags = 20
-        if random() <= (chance100[keyn]/100):    
+        if random() <= (chance100[keyn]/100):
             frags = 100
             keyn = 0
-        chance = random()
-        if chance <= 0.40:
-            choosen = choice([char1,char2,char3])
-            chars[choosen] += frags
-        else:
-            chars['others'] += frags
-    return chars
+        if random() <= (chance/100):
+            total_frags += frags
+    return total_frags   
 
-def GetKeys(chance, frags_target):
+def GetKeys(chance, target):
+    keyn = 0
+    chance100 = (10,10,10,10,10,10,10,10,10,10,25,50,75,100)
+    total_frags = 0
+    total_keys = 0
+    while total_frags < target:
+        keyn += 1
+        frags = 20
+        if random() <= (chance100[keyn]/100):
+            frags = 100
+            keyn = 0
+        if random() <= (chance/100):
+            total_frags += frags
+        total_keys += 1
+    return total_keys
+
+def MediaKeys(chance, target):
+    loops = [(500,1000000), (1000,100000), (2000,10000)]
+    for i in loops:
+        if target > 2000 or target == 0:
+            return None
+        elif target <= i[0]:
+            loop = i[1]
+            break
     total_geral = 0
     min = 0
     max = 0
-    loop = 100000
     for i in range(0,loop):
-        total_frags = 0
-        num_keys = 0
-        key_num = 0
-        chance_100 = [10,10,10,10,10,10,10,10,10,10,25,50,75,100]
-        while total_frags < frags_target:
-            key_num += 1
-            num_keys += 1
-            
-            choice_frags = random()
-            if choice_frags <= chance_100[key_num]/100:
-                frags = 100
-                key_num = 0
-            else:
-                frags = 20
-                
-            choice_char = random()
-            if choice_char <= chance/100:
-                total_frags += frags
+        num_keys = GetKeys(chance, target)
         if num_keys < min or min == 0:
             min = num_keys
         if num_keys > max:
             max = num_keys
         total_geral += num_keys
-    return total_geral/loop,min,max
+    return ((total_geral/loop), min, max, loop)
+
+def MediaFrags(chance, keys):
+    loops = [(100,1000000), (500,100000), (1000,10000)]
+    for i in loops:
+        if keys > 1000 or keys == 0:
+            return None
+        elif keys <= i[0]:
+            loop = i[1]
+            break
+    total_geral = 0
+    min = 0
+    max = 0
+    for i in range(0,loop):
+        num_frags = GetFrags(chance,keys)
+        if num_frags < min or min == 0:
+            min = num_frags
+        if num_frags > max:
+            max = num_frags
+        total_geral += num_frags
+    return ((total_geral/loop), min, max, loop)
 
 def Boosts(start,end,try_cost, sky, wise, crimson):
     chances = [35,30,25,20,22,18,14,10,10,9,8,7]
@@ -346,7 +339,6 @@ def Boosts(start,end,try_cost, sky, wise, crimson):
     for i in range(0,3):
         text += f'{cristais_name[i]}: {cristais[i]:.2f}\n'
     return text
-
 
 
 #PXG

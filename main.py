@@ -5,7 +5,6 @@ import discord
 import asyncio
 from datetime import datetime, time, timedelta
 import io
-from PIL import Image, ImageFont, ImageDraw
 
 
 def main():
@@ -67,11 +66,16 @@ def main():
 #----------------Começo do comando Stars
     @bot.command(brief="Tabela de estrelas (preço ou força)", 
                 usage="<tipo>", 
-                description="Mostra uma tabela de Estrelas (Preço ou Força).\nTipos:\npower\nprice")
-    async def stars(ctx):
-        await ctx.send(file=discord.File('imgs/stars_percent.png'))
-        await ctx.send(file=discord.File('imgs/stars.png'))
-        await ctx.send(file=discord.File('imgs/frags.png')) 
+                description="Mostra uma tabela de Estrelas.\nTipos:\npower\nprice\nfrags")
+    async def stars(ctx, type):
+        if type.lower() == 'power':
+            await ctx.send(file=discord.File('stars/stars_power.png'))
+        elif type.lower() == 'price':
+            await ctx.send(file=discord.File('stars/stars_price.png'))
+        elif type.lower() == 'frags':
+            await ctx.send(file=discord.File('stars/stars_frags.png'))
+        else:
+            await ctx.send(' um tipo: !stars power, !stars price or !stars frags')
 #----------------Fim do comando Stars
 
 #----------------Começo do comando Craft
@@ -83,31 +87,12 @@ def main():
         if qty > 1000:
             await ctx.send("Quantidade muito alta")
         else:
-            custo = 0
-            msg = ''
-            try:
-                x = GetRecipe(nome.lower(), qty)
-                for local, recipes in x.items():
-                    for ing, qty in recipes.items():
-                        if isinstance(qty[0], int) and qty[0] > 0:
-                            msg += f"```>>>>>{local.upper()}<<<<<\n"
-                            break
-                    for ing, qty in recipes.items():
-                        if isinstance(qty[0], int) and qty[0] > 0:
-                            custo += qty[1]
-                            msg += f"{ing.capitalize()} - {qty[0]} > ${qty[1]}\n"
-                    for ing, qty in recipes.items():
-                        if isinstance(qty[0], int) and qty[0] > 0:
-                            msg += '```'
-                            break
-                await ctx.send(msg)
-                await ctx.send(f"Custo total: {custo}")
-            except:
-                await ctx.send("""Item não encontrado (utilize ç e ~).
-Para encontrar o nome correto do item, tente o comando `!buscarcraft <parte do nome>`
-EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
-""")
-    
+            image = MontarCraft(nome,qty)
+            with io.BytesIO() as image_binary:
+                image.save(image_binary, 'PNG')
+                image_binary.seek(0)
+                await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+
     @craft.error
     async def craft_error(ctx, error):
         if isinstance(error, BadArgument):
@@ -148,28 +133,29 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
 #----------------Fim do Comando InfoChar
 
 #----------------Começo do Comando Bau
-    @bot.command(brief="Simula uma rotação de bau",
-                usage="<char1> <char2> <char3> <keyn>",
-                description="Simula um bau de rotação")
-    async def bau(ctx, char1, char2, char3, keyn: int):
-        c = BauRot(char1, char2, char3, keyn)
-        text = '```'
-        for k,v in c.items():
-            text += f"{k.capitalize()}: {v}\n"
-        text += '```'
-        await ctx.send(text)
+    @bot.command(brief="Calcula a média de Fragmentos obtidos com X Chaves",
+                usage="<chance> <num_keys>",
+                description="Retorna a média de fragmentos com X chaves")
+    async def keys(ctx, chance: float, keys: int):
+        info = MediaFrags(chance, keys)
+        if info == None:
+            await ctx.send("Número de `Chaves` deve ser maior que 0 e menor que 1001")
+        else:
+            await ctx.send(f'```Loop: {info[3]}\nMédia de Fragmentos: {info[0]:.2f}\
+            \nMinimo: {info[1]}  \nMáximo: {info[2]}```')
 #----------------Fim do comando Bau
 
 #----------------Começo do Comando Keys
-    @bot.command(brief="Média de Chaves",
+    @bot.command(brief="Calcula a média de Chaves usadas para obter X Fragmentos",
                 usage="<chance> <frags_target>",
-                description="Calcula a média de chaves necessária para conseguir X fragmentos")
-    async def keys(ctx, chance: float, target: int):
-        text = GetKeys(chance, target)
-        keys = text[0]
-        min = text[1]
-        max = text[2]
-        await ctx.send(f'```Média de Chaves: {keys:.2f} \nMinimo: {min}  \nMáximo: {max}```')
+                description="Retorna a média de chaves para x fragmentos")
+    async def frags(ctx, chance: float, target: int):
+        info = MediaKeys(chance, target)
+        if info == None:
+            await ctx.send("Número de `Fragmentos` deve ser maior que 0 e menor que 2001")
+        else:
+            await ctx.send(f'```Loop: {info[3]}\nMédia de Chaves: {info[0]:.2f}\
+            \nMinimo: {info[1]}  \nMáximo: {info[2]}```')
         
 #----------------Fim do comando Keys
 
@@ -255,7 +241,7 @@ EX (procurar o nome do item "Medalhão de carne"): `!buscarcraft medalh`
 
 #----------------INICIALIZAÇÃO DO BOT
     bot.loop.create_task(background_task())
-    bot.run("Token")
+    bot.run("NTcyNDkzOTYyMzA1MDc3MjU5.XMdGjQ.ENwjg83IGH0Jggy0R3Pbj8x2Qjs")
 
 #----------------EXECUÇÃO
 main()
