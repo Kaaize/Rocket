@@ -5,13 +5,24 @@ import discord
 import asyncio
 from datetime import datetime, time, timedelta
 import io
+import json
 
 
 def main():
     intents = discord.Intents.default()
     intents.members = True
-   # bot = commands.Bot(command_prefix='?')
-    bot = commands.Bot(command_prefix='!', case_insensitive=True, intents=intents)
+
+
+    #bot = commands.Bot(command_prefix='!', case_insensitive=True, intents=intents)
+    def get_prefix(bot=None, message=None):
+        with open('prefixes.json', 'r') as f:
+            prefixes = json.load(f)
+        try:
+            prefix = str(message.guild.id)
+            return prefixes[prefix]
+        except AttributeError:
+            return ['defaultPrefix']
+    bot = commands.Bot(command_prefix=get_prefix)
     
 #----------------EVENTOS
     @bot.event
@@ -29,7 +40,38 @@ def main():
         channel = bot.get_channel(846191030164520970)
         msg = f"{member.name} deixou o Servidor."
         await channel.send(msg)
+
+    #Prefix (start)
+    @bot.event
+    async def on_guild_join(guild):
+        with open('prefixes.json', 'r') as f:
+            prefixes = json.load(f)
+        prefixes[str(guild.id)] = 'GG'
+
+        with open('prefixes.json', 'w') as f:
+            json.dump(prefixes, f, indent=4)
+
+    @bot.event
+    async def on_guild_remove(guild):
+        with open('prefixes.json', 'r') as f:
+            prefixes = json.load(f)
+        prefixes.pop(str(guild.id))
+
+        with open('prefixes.json', 'w') as f:
+            json.dump(prefixes, f, indent=4)
+    #Prefix (end)
 #----------------COMANDOS
+
+#Prefix (start)
+    @bot.command(brief="Modifica o prefixo do bot padrão: !")
+    async def prefix(ctx, prefix):
+        with open('prefixes.json', 'r') as f:
+            prefixes = json.load(f)
+        prefixes[str(ctx.guild.id)] = prefix
+
+        with open('prefixes.json', 'w') as f:
+            json.dump(prefixes, f, indent=4)
+#Prefix (end)
 
 #----------------Começo do comando GetPots
     @bot.command(brief="Calcula as Poções Necessárias", 
