@@ -8,6 +8,9 @@ import pathlib
 PATH = pathlib.Path(__file__).parent.resolve()
 #----------------FUNÇÕES
 
+def map_range(x, in_min, in_max, out_min, out_max):
+  return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
+
 def GetExp(lv):
     lv = lv-1
     return ((50 * lv * lv * lv) - (150 * lv * lv) + (400 * lv)) / 3
@@ -266,13 +269,7 @@ def GetKeys(chance, target):
     return total_keys
 
 def MediaKeys(chance, target):
-    loops = [(500,1000000), (1000,100000), (2000,10000)]
-    for i in loops:
-        if target > 2000 or target == 0:
-            return None
-        elif target <= i[0]:
-            loop = i[1]
-            break
+    loop = map_range(target, 0, 2000, 1000000, 10000)
     total_geral = 0
     min = 0
     max = 0
@@ -286,13 +283,7 @@ def MediaKeys(chance, target):
     return ((total_geral/loop), min, max, loop)
 
 def MediaFrags(chance, keys):
-    loops = [(100,1000000), (500,100000), (1000,10000)]
-    for i in loops:
-        if keys > 1000 or keys == 0:
-            return None
-        elif keys <= i[0]:
-            loop = i[1]
-            break
+    loop = map_range(keys, 0, 2000, 1000000, 10000)
     total_geral = 0
     min = 0
     max = 0

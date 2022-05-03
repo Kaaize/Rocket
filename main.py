@@ -202,12 +202,14 @@ def main():
                 usage="<chance> <num_keys>",
                 description="Retorna a média de fragmentos com X chaves")
     async def keys(ctx, chance: float, keys: int):
+        if chance < 13.33:
+            await ctx.send("Chance não pode ser menor que 13.33")
+            return
+        if keys > 500:
+            await ctx.send("Chave não pode ser maior que 500")
         info = MediaFrags(chance, keys)
-        if info == None:
-            await ctx.send("Número de `Chaves` deve ser maior que 0 e menor que 1001")
-        else:
-            await ctx.send(f'```Loop: {info[3]}\nMédia de Fragmentos: {info[0]:.2f}\
-            \nMinimo: {info[1]}  \nMáximo: {info[2]}```')
+        await ctx.send(f'```Loop: {info[3]}\nMédia de Fragmentos: {info[0]:.2f}\
+        \nMinimo: {info[1]}  \nMáximo: {info[2]}```')
 #----------------Fim do comando Bau
 
 #----------------Começo do Comando Keys
@@ -215,12 +217,14 @@ def main():
                 usage="<chance> <frags_target>",
                 description="Retorna a média de chaves para x fragmentos")
     async def frags(ctx, chance: float, target: int):
+        if chance < 13.33:
+            await ctx.send("Chance não pode ser menor que 13.33")
+            return
+        if target > 2000:
+            await ctx.send("Alvo de fragmentos não pode ser maior que 2000")
         info = MediaKeys(chance, target)
-        if info == None:
-            await ctx.send("Número de `Fragmentos` deve ser maior que 0 e menor que 2001")
-        else:
-            await ctx.send(f'```Loop: {info[3]}\nMédia de Chaves: {info[0]:.2f}\
-            \nMinimo: {info[1]}  \nMáximo: {info[2]}```')
+        await ctx.send(f'```Loop: {info[3]}\nMédia de Chaves: {info[0]:.2f}\
+        \nMinimo: {info[1]}  \nMáximo: {info[2]}```')
         
 #----------------Fim do comando Keys
 
