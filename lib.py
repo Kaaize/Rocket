@@ -54,6 +54,11 @@ Poções Pequenas: {small_needed}```""")
 
 #Funções para o comando Craft (Start)
 result = {} #variavel responsavel por armazenar todos as informações de craft
+
+def CraftClean():
+    global result
+    result = {}
+    
 def GetInfo(item, qty):
     tree = ET.parse('crafts/items.xml')
     item = Joiner(item)
@@ -74,6 +79,7 @@ def Spliter(nome):
 
 def GetCraft(item, qty: int):
     global result
+    result = dict(sorted(result.items())) #organizando os locais por ordem alfabetica
     info = GetInfo(item,1)
     tree = ET.parse(f"crafts/{info[0]}/{item}.xml")
     root = tree.getroot()
@@ -104,39 +110,44 @@ def TryImage(path: str):
         print('Erro', e)
         return Image.open('blank.png').convert('RGBA')
 
-def MontarCraft(nome, qty: int):
+def MontarCraft(nomes, qtys):
     global result
-    nome = Joiner(nome)
-    GetCraft(nome,qty) #passando as informações pra varival global result, atraves da função GetCraft
-    title_font = ImageFont.truetype('crafts/imgs/font.TTF', 15) #fonte usada
-    size = 2 #tamanho que a imagem vai ser montada (2 inicial, craft + total)
     line = 0 #posição verical inicial
     total_price = 0 #preço total
     largura = 500 #largura da imagem
-    #obtendo a quantidade items para adicionar tamanho vertical a imagem
+    title_font = ImageFont.truetype('crafts/imgs/font.ttf', 15) #fonte usada
+    size = 2 #tamanho que a imagem vai ser montada (2 inicial, craft + total)
     for item in result:
         size += 1+len(result[item])
     #criando a imagem e deixando editavel editavel
-    text_img = Image.new('RGBA', (largura,size*45), (0,70,100,255))
-    image_editable = ImageDraw.Draw(text_img)
-    #adicionando nome e quantidade do craft na imagem
-    type = TryImage(f'crafts/imgs/{GetPlace(nome)}/{nome}.png')
-    text_img.paste(type, (largura//2-16,line), mask=type)
-    image_editable.text((largura//2,line+40),str(qty), (255,255,255), font=title_font, anchor="mm")
+    image = Image.new('RGBA', (largura,size*45), (0,70,100,255))
+    image_editable = ImageDraw.Draw(image)
+    
+    #fundindo icones e adicionando icone dos crafts 
+    fusion_icon = Image.new('RGBA', (32*len(nomes),52), (0,70,100,255))
+    tam = len(nomes)
+    for i in range(0,tam):
+        icon = TryImage(f'crafts/imgs/{GetPlace(nomes[i])}/{Joiner(nomes[i])}.png')
+        icon_editable = ImageDraw.Draw(fusion_icon)
+        icon_editable.text(((i*32)+16,45),qtys[i], (255,255,255), font=title_font, anchor="mm")
+        fusion_icon.paste(icon, (i*32,0), mask=icon)
+        
+    image.paste(fusion_icon, (largura//2-fusion_icon.size[0]//2,line), mask=fusion_icon)
+
     line+=10 #espaçamento vertical
     for local, craft in result.items():
         line += 45 #espaçamento vertical
     
         #adicionando Local de Aquisição na imagem
         type = TryImage(f'crafts/imgs/base.png') #tentando carregar imagem do local de aquisição
-        text_img.paste(type, (0,line), mask=type)
+        image.paste(type, (0,line), mask=type)
         image_editable.text((largura//2,line+15),local.upper(), (255,255,255), font=title_font, anchor="mm")
         #passando por cada item para adicionar na imagem
         for key, value in craft.items(): 
             line += 45 #espaçamento vertical
             total_price += value[1] #somando valor total
             type = TryImage(f'crafts/imgs/{GetPlace(key)}/{key}.png') #tentando carregar imagem do item
-            text_img.paste(type, (10,line), mask=type) #adicionando imagem do item
+            image.paste(type, (10,line), mask=type) #adicionando imagem do item
 
             #adicionando texto de nome, quantidade e valor do item
             image_editable.text((45,line+5), Spliter(key), (255,255,255), font=title_font)
@@ -146,7 +157,7 @@ def MontarCraft(nome, qty: int):
     #total e zerando a variavel para os proximos usos
     image_editable.text((largura//2,line),f'${str(total_price).upper()}', (255,255,255), font=title_font, anchor="mm")
     result = {}
-    return text_img
+    return image
 
 def Find(nome):
     dirs = ['arsenal2','arsenal3','arsenal4','arsenal5','refinaria','cozinheira_aliança']
@@ -182,14 +193,13 @@ def CreateImageInfo(name):
     infos = root.attrib
     #Imagem base, fonte e cor
     base_image = Image.open('personagens/imgs/base/base.png')
-    title_font = ImageFont.truetype('personagens/imgs/base/font.TTF', 18)
+    title_font = ImageFont.truetype('personagens/imgs/base/font.ttf', 18)
     COR = (255,255,255)
     TIERS = {'Bronze':(191,137,112), 'Prata':(178,169,173), 'Ouro':(255,215,0), 'Diamante':(185,242,255)}
     BRANCO = (255,255,255)
     
     #Adição da foto
     portrait = TryImage(f'personagens/imgs/{name.capitalize()}_medal.png')
-    #portrait = Image.open(f'personagens/imgs/{name.capitalize()}_medal.png').convert('RGBA')
     text_img = Image.new('RGBA', (340,230), (0,0,0,0))
     text_img.paste(base_image, (0,0))
     text_img.paste(portrait, (13,9), mask=portrait)
@@ -198,7 +208,6 @@ def CreateImageInfo(name):
     icons = infos['tags'].split(";")
     for i in range(0,len(icons)):
         icon = TryImage(f"personagens/imgs/base/{icons[i].lower()}.png")
-        #icon = Image.open(f"personagens/imgs/base/{icons[i].lower()}.png").convert('RGBA')
         text_img.paste(icon, (130+(i*30),75), mask=icon)
     
     #colocando base_image de volta como imagem variavel a ser usada

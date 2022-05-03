@@ -32,11 +32,16 @@
     medalhão_de_carne="0"
     salada_italiana="0"
     espeto_de_carne_gourmet="0"
-    currry_de_coelho="0"
+    curry_de_coelho="0"
     camarões_salteados="0"
     ensopado_de_ostra="0"
     paella_de_frutos_do_mar="0"
-    atum_grelhado="0"/>
+    atum_grelhado="0"
+    kit80="0"
+    kit90="0"
+    kit100="0"
+    kit110="0"
+    />
 <npc
     tora_de_madeira="10"
     algodão_de_baixa_qualidade="5"

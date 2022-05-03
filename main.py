@@ -1,4 +1,4 @@
-from discord.ext.commands.errors import BadArgument, BadBoolArgument
+from discord.ext.commands.errors import BadArgument
 from lib import *
 from discord.ext import commands
 import discord
@@ -30,6 +30,10 @@ def main():
         print("BOT ONLINE!")
     
     @bot.event
+    async def on_guild_join(guild):
+        await guild.text_channels[1].send(f"Estou aqui, use {get_prefix}help")
+
+    @bot.event
     async def on_member_join(member):
         channel = bot.get_channel(846191030164520970)
         msg = f"{member.mention} entrou no Servidor."
@@ -46,7 +50,7 @@ def main():
     async def on_guild_join(guild):
         with open('prefixes.json', 'r') as f:
             prefixes = json.load(f)
-        prefixes[str(guild.id)] = 'GG'
+        prefixes[str(guild.id)] = 'r!'
 
         with open('prefixes.json', 'w') as f:
             json.dump(prefixes, f, indent=4)
@@ -59,11 +63,14 @@ def main():
 
         with open('prefixes.json', 'w') as f:
             json.dump(prefixes, f, indent=4)
+
+
     #Prefix (end)
 #----------------COMANDOS
 
 #Prefix (start)
     @bot.command(brief="Modifica o prefixo do bot padrão: !")
+    @commands.has_permissions(administrator = True)
     async def prefix(ctx, prefix):
         with open('prefixes.json', 'r') as f:
             prefixes = json.load(f)
@@ -71,6 +78,13 @@ def main():
 
         with open('prefixes.json', 'w') as f:
             json.dump(prefixes, f, indent=4)
+        await ctx.send(f"Prefix now is {prefix}")
+    @prefix.error
+    async def prefix_error(ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            msg = "Você não tem permissão para isso."
+            await ctx.send(msg)
+
 #Prefix (end)
 
 #----------------Começo do comando GetPots
@@ -109,7 +123,7 @@ def main():
     @bot.command(brief="Tabela de estrelas (preço ou força)", 
                 usage="<tipo>", 
                 description="Mostra uma tabela de Estrelas.\nTipos:\npower\nprice\nfrags")
-    async def stars(ctx, type):
+    async def stars(ctx, type=''):
         if type.lower() == 'power':
             await ctx.send(file=discord.File('stars/stars_power.png'))
         elif type.lower() == 'price':
@@ -125,21 +139,31 @@ def main():
                 usage="<\"comida\"> <quantidade>", 
                 description="Mostra a quantidade de itens necessária para para Craftar algo na quantidade \
                 esolhida.\nEX: !craft \"ramen misto\" 10\n**Nomes com espaço precisam estar entre aspas.**")
-    async def craft(ctx, nome, qty = 1):
-        if qty > 1000:
-            await ctx.send("Quantidade muito alta")
+    async def craft(ctx, *kargs):
+        CraftClean()
+        if len(kargs) > 3:
+            nomes = kargs[::2]
+            qtys = kargs[1::2]
         else:
-            image = MontarCraft(nome,qty)
+            nomes = [kargs[0]]
+            qtys = [kargs[1]]
+        for i in range(0,len(nomes)):
+            GetCraft(Joiner(nomes[i]),int(qtys[i]))
+            if int(qtys[i]) > 100:
+                await ctx.send("Quantidade muito alta")
+                return
+        else:
+            image = MontarCraft(nomes,qtys)
             with io.BytesIO() as image_binary:
                 image.save(image_binary, 'PNG')
                 image_binary.seek(0)
                 await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
-    @craft.error
+    """@craft.error
     async def craft_error(ctx, error):
         if isinstance(error, BadArgument):
             await ctx.send("Argumentos invalidos. \nPara nomes com espaço, use Aspas (\"sopa mista picante\") \
-            \ntente também `!help craft`")
+            \ntente também `!help craft`")"""
 #----------------Fim do comando Craft
 
 #----------------Começo do comando Find
@@ -148,7 +172,6 @@ def main():
     async def find(ctx, nome):
         if len(nome) >= 3:
             msg = Find(nome)
-            print(msg)
             if msg == '':
                 await ctx.send("Nenhum item encontrado")
             else:
@@ -245,9 +268,22 @@ def main():
 #---------------------------------    
     async def evento(name, time):  
         await bot.wait_until_ready()  
-        channel = bot.get_channel(824552982728409089)
-        msg = f'<@&930481857550778368> {name} em {time} Minutos!'
-        await channel.send(msg)
+        
+        if 'bot_commands':
+            for guild in bot.guilds:
+                # if you want to find the channel by id
+                # selectedVcChannel = discord.utils.get(guild.channels, id=voice_channel_id)
+                channel = discord.utils.get(guild.channels, name='bot_commands')
+                # If you want the first channel found with the name of 'VcChannelName' 
+                # you can add this condition with a break statement,
+                # you obviously don't need this if you use id
+                if channel:
+                    try:
+                        role = discord.utils.get(guild.roles, name="Evento")
+                        msg = f'{role.mention} {name} em {time} Minutos'
+                    except AttributeError:
+                        msg = f'{name} em {time} Minutos'
+                    await channel.send(msg)
 
     @bot.event
     async def background_task():
@@ -269,16 +305,25 @@ def main():
             seconds = (amanha - agora).total_seconds()
             await asyncio.sleep(seconds)
 #---------------------------------
-
     @bot.event
     async def on_message(message):
+        if message.author.id == 572493962305077259:
+            return
 
-            if message.channel.name == 'bot_commands':
-                await bot.process_commands(message)
-            if message.channel.name == 'votação':
-                emotes = ['👍','👎']
-                for i in emotes:
-                    await message.add_reaction(i)
+        if 'prefix' == message.content and message.channel.name == 'bot_commands':
+            with open('prefixes.json', 'r') as f:
+                prefixes = json.load(f)
+            prefix = prefixes[str(message.guild.id)]
+            await message.channel.send(f'My prefix is: {prefix}')
+
+
+        if message.channel.name == 'bot_commands':
+            await bot.process_commands(message)
+        if message.channel.name == 'votação':
+            emotes = ['👍','👎']
+            for i in emotes:
+                await message.add_reaction(i)
+
 
 
 #----------------INICIALIZAÇÃO DO BOT
