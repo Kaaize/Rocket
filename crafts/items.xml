@@ -54,19 +54,19 @@
     tora_de_mogno="150"
     algodão_melhorado="110"
     minério_de_aço="225"
-    pólvora_superior="450" />
-<drop
-    bala_de_canhão="0"
-    cola="0"
-    cano_de_arma="0"
-    lata_de_óleo="0"
-    cogumelo_venenoso="0"
-    líquido_inflámavel="0"
-    tanque_de_ar="0"
-    bateria="0"
-    grande_cola="0"
-    cano_de_arma_superior="0"
-    bala_de_canhão_de_aço="0"/>
+    pólvora_superior="450"
+    cola="200"
+    cano_de_arma="350"
+    bala_de_canhão="750"
+    grande_cola="300"
+    bala_de_canhão_de_aço="1125"
+    bateria="500"
+    líquido_inflámavel="500"
+    tanque_de_ar="500"
+    lata_de_óleo="500"
+    cogumelo_venenoso="500"
+    cano_de_arma_superior="525"
+    planta="5000"/>
 <arsenal2
     barco2="0"
     canhão2="0"
@@ -118,6 +118,7 @@
     metralhadora5="0"
     acelerar5="0"
     canhão_pesado5="0"
+    explosão_de_velocidade5="0"
     />
 <refinaria 
     prancha_de_madeira="0"

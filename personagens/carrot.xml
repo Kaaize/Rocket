@@ -2,7 +2,7 @@
 <data
 name="Carrot"
 tier="Ouro"
-tags="Lutador;Especialista;DPS;Mink"
+tags="Cortante;Especialista;DPS"
 base_health="2600"
 vitalidade="234;256;279;302;325;347"
 speed="300"

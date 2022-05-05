@@ -3,7 +3,7 @@
 segunda="Count,9,35,0;Quiz,15,5,0;Deathmatch,19,5,0;Race Ship,22,5,0"
 terça="Quiz,9,35,0;Deathmatch,15,5,0;Race Trap,19,5,0;Count,22,5,0"
 quarta="Deathmatch,9,35,0;Race Ship,15,5,0;Count,19,5,0;Quiz,22,5,0"
-quinta="Race Trap,9,35,0;Count,15,5,0;Quiz,19,5,0;Deathmatch,22,5,0"
+quinta="Race Trap,9,35,0;Count,15,5,0;Quiz,19,5,0;Deathmatch,22,5,0;Reset Semanal + Carrot,23,59,59"
 sexta="Count,9,35,0;Quiz,15,5,0;Deathmatch,19,5,0;Race Ship,22,5,0"
 sabado="Quiz,9,35,0;Deathmatch,15,5,0;Race Trap,19,5,0;Count,22,5,0"
 domingo="Race Ship,9,35,0;Count,15,5,0;Quiz,19,5,0;Deathmatch,22,5,0"

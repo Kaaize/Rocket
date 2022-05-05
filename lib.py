@@ -122,12 +122,14 @@ def MontarCraft(nomes, qtys):
     size = 2 #tamanho que a imagem vai ser montada (2 inicial, craft + total)
     for item in result:
         size += 1+len(result[item])
-    #criando a imagem e deixando editavel editavel
-    image = Image.new('RGBA', (largura,size*45), (0,70,100,255))
+    #criando a imagem e deixando editavel editaveL
+    BG_COLOR = (19, 13, 10, 255)
+    #BG_COLOR = (0,70,100,255)
+    image = Image.new('RGBA', (largura,size*45), BG_COLOR)
     image_editable = ImageDraw.Draw(image)
     
     #fundindo icones e adicionando icone dos crafts 
-    fusion_icon = Image.new('RGBA', (32*len(nomes),52), (0,70,100,255))
+    fusion_icon = Image.new('RGBA', (32*len(nomes),52), BG_COLOR)
     tam = len(nomes)
     for i in range(0,tam):
         icon = TryImage(f'crafts/imgs/{GetPlace(nomes[i])}/{Joiner(nomes[i])}.png')
@@ -270,10 +272,11 @@ def GetKeys(chance, target):
 
 def MediaKeys(chance, target):
     loop = map_range(target, 0, 2000, 1000000, 10000)
+    loop *= map_range(chance, 13.33, 100, 0.1, 1)
     total_geral = 0
     min = 0
     max = 0
-    for i in range(0,loop):
+    for i in range(0,int(loop)):
         num_keys = GetKeys(chance, target)
         if num_keys < min or min == 0:
             min = num_keys
@@ -284,10 +287,11 @@ def MediaKeys(chance, target):
 
 def MediaFrags(chance, keys):
     loop = map_range(keys, 0, 2000, 1000000, 10000)
+    loop *= map_range(chance, 13.33, 100, 0.1, 1)
     total_geral = 0
     min = 0
     max = 0
-    for i in range(0,loop):
+    for i in range(0,int(loop)):
         num_frags = GetFrags(chance,keys)
         if num_frags < min or min == 0:
             min = num_frags
