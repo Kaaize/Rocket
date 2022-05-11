@@ -3,10 +3,41 @@ import xml.etree.ElementTree as ET
 from PIL import Image, ImageFont, ImageDraw
 import os
 import pathlib
+import psycopg2
 
 
 PATH = pathlib.Path(__file__).parent.resolve()
 #----------------FUNÇÕES
+
+class Conexao(object):
+	_db=None
+	def __init__(self, mhost, db, usr, pwd):
+		self._db = psycopg2.connect(host=mhost, database=db, user=usr,  password=pwd)
+	def manipular(self, sql):
+		try:
+			cur=self._db.cursor()
+			cur.execute(sql)
+			cur.close();
+			self._db.commit()
+		except:
+			return False;
+		return True;
+	def consultar(self, sql):
+		rs=None
+		try:
+			cur=self._db.cursor()
+			cur.execute(sql)
+			rs=cur.fetchall();
+		except:
+			return None
+		return rs
+	def proximaPK(self, tabela, chave):
+		sql = f'select max({chave}) from {tabela}'
+		rs = self.consultar(sql)
+		pk = rs[0][0]
+		return pk+1
+	def fechar(self):
+		self._db.close()
 
 def map_range(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
@@ -193,7 +224,10 @@ def GetEvents():
 #Funções do comand Infochar (Start)
 def CreateImageInfo(name):
     #Abrindo e obtendo info do XML
-    tree = ET.parse(f'personagens/{name}.xml')
+    try:
+        tree = ET.parse(f'personagens/{name}.xml')
+    except FileNotFoundError:
+        return "Personagem não encontrado"
     root = tree.getroot()
     infos = root.attrib
     #Imagem base, fonte e cor
@@ -270,46 +304,40 @@ def GetKeys(chance, target):
         total_keys += 1
     return total_keys
 
-def MediaKeys(chance, target):
+def MediaKeys(chance, target, keys_target):
     loop = map_range(target, 0, 2000, 1000000, 10000)
-    loop *= map_range(chance, 13.33, 100, 0.1, 1)
+    loop *= map_range(chance, 13.33, 100, 0.25, 1.2)
     total_geral = 0
-    min = 0
-    max = 0
+    sucess = 0
     for i in range(0,int(loop)):
         num_keys = GetKeys(chance, target)
-        if num_keys < min or min == 0:
-            min = num_keys
-        if num_keys > max:
-            max = num_keys
+        if num_keys <= keys_target:
+            sucess += 1
         total_geral += num_keys
-    return ((total_geral/loop), min, max, loop)
+    return ((total_geral/loop), loop, (sucess/loop))
 
-def MediaFrags(chance, keys):
+def MediaFrags(chance, keys, frags_target):
     loop = map_range(keys, 0, 2000, 1000000, 10000)
-    loop *= map_range(chance, 13.33, 100, 0.1, 1)
+    loop *= map_range(chance, 13.33, 100, 0.25, 1.2)
     total_geral = 0
-    min = 0
-    max = 0
+    sucess = 0
     for i in range(0,int(loop)):
         num_frags = GetFrags(chance,keys)
-        if num_frags < min or min == 0:
-            min = num_frags
-        if num_frags > max:
-            max = num_frags
+        if num_frags >= frags_target:
+            sucess += 1
         total_geral += num_frags
-    return ((total_geral/loop), min, max, loop)
+    return ((total_geral/loop), loop, (sucess/loop))
 
 def Boosts(start,end,try_cost, sky, wise, crimson):
     chances = [35,30,25,20,22,18,14,10,10,9,8,7]
     cap = [3,4,5,6,5,6,8,11,11,12,13,15]
     cristais = [0,0,0]
     cristais_name = ['Céu', 'Sábio', 'Carmesin']
-    tipo = try_cost
     custo = 0
     start_boost = start
     final_boost = end
-    for i in range(0,10000):
+    loop = 100000
+    for i in range(0,loop):
         tent = 0
         boost = start_boost
         while boost < final_boost:
@@ -318,30 +346,30 @@ def Boosts(start,end,try_cost, sky, wise, crimson):
                 if sorteio <= (chances[boost]/100) or j+1 == cap[boost]:
                     tent += 1
                     if boost < 4:
-                        custo += tipo*sky
-                        cristais[0] += try_cost/10000
+                        custo += try_cost*sky
+                        cristais[0] += try_cost
                     elif boost < 8:
-                        custo += tipo*wise
-                        cristais[1] += try_cost/10000
+                        custo += try_cost*wise
+                        cristais[1] += try_cost
                     else:
-                        custo += tipo*crimson
-                        cristais[2] += try_cost/10000
+                        custo += try_cost*crimson
+                        cristais[2] += try_cost
                     boost += 1
                     break
                 else:
                     tent += 1
                     if boost < 4:
-                        custo += tipo*sky
-                        cristais[0] += try_cost/10000
+                        custo += try_cost*sky
+                        cristais[0] += try_cost
                     elif boost < 8:
-                        custo += tipo*wise
-                        cristais[1] += try_cost/10000
+                        custo += try_cost*wise
+                        cristais[1] += try_cost
                     else:
-                        custo += tipo*crimson
-                        cristais[2] += try_cost/10000
-    text = f'{int(custo//10000):0,}\n'.replace(',','.')
+                        custo += try_cost*crimson
+                        cristais[2] += try_cost
+    text = f'{int(custo//loop):0,}\n'.replace(',','.')
     for i in range(0,3):
-        text += f'{cristais_name[i]}: {cristais[i]:.2f}\n'
+        text += f'{cristais_name[i]}: {cristais[i]/loop:.2f}\n'
     return text
 
 
