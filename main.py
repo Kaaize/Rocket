@@ -10,10 +10,10 @@ import io
 import json
 from dropdowns import *
 
-host = 'ec2-34-231-177-125.compute-1.amazonaws.com'
-db = 'd8ijdhkdpdsoi8'
-user = 'pshbwjlncrcucl'
-password = '6e0aa83c2a6c4c4581a062d27e667799bc750cde33b1930a4718b98e386c56b7'
+host = ''
+db = ''
+user = ''
+password = ''
 
 def main():
     intents = discord.Intents.default()
